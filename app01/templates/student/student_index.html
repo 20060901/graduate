@@ -1,0 +1,418 @@
+{% extends 'student/student_layout.html' %}
+{% load static %}
+{% block notice %}
+    <li class="dropdown notification-list">
+        <button class="nav-link dropdown-toggle arrow-none" data-bs-toggle="dropdown" id="btnViewsNotice"
+                role="button"
+                aria-haspopup="false" aria-expanded="false">
+            <i class="ri-notification-3-fill fs-22"></i>
+            <!-- 未读红点，想要已读删除span的class属性即可 -->
+            {% if stu_info.is_read == 1 %}
+                <span></span>
+            {% else %}
+                <span class="noti-icon-badge"></span>
+            {% endif %}
+
+        </button>
+        <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated dropdown-lg py-0">
+            <div class="p-2 border-top-0 border-start-0 border-end-0 border-dashed border">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h6 class="m-0 fs-16 fw-medium"> 通知</h6>
+                    </div>
+                    <div class="col-auto">
+                        <a href="javascript:void(0);" class="text-dark text-decoration-underline"
+                           id="clearAllNotice" eid="{{ stu_info.id }}">
+                            <small>标为已读</small>
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+
+            <div style="max-height: 300px;" data-simplebar>
+
+                <!-- item-->
+                {% for notice in notices %}
+                    <a href="/student/notice/"
+                       class="dropdown-item p-0 notify-item unread-noti card m-0 shadow-none">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="notify-icon bg-primary">
+                                        <i class="ri-message-3-line fs-18"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1 text-truncate ms-2">
+                                    <h5 class="noti-item-title fw-medium fs-14">{{ notice.title }}
+                                        <small class="fw-normal text-muted float-end ms-1">{{ notice.created_at|date:"Y-m-d H:i" }}</small>
+                                    </h5>
+                                    <small class="noti-item-subtitle text-muted">{{ notice.content }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+
+            <!-- All-->
+            <a href="/student/notice/"
+               class="dropdown-item text-center text-primary text-decoration-underline fw-bold notify-item border-top border-light py-2">
+                查看所有
+            </a>
+
+        </div>
+    </li>
+{% endblock %}
+{% block content %}
+    <div class="content-page">
+        <div class="content">
+
+            <!-- Start Content-->
+            <div class="container-fluid">
+                <!-- start page title -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="page-title-box justify-content-between d-flex align-items-md-center flex-md-row flex-column">
+                            <h4 class="page-title">个人信息</h4>
+                            <ol class="breadcrumb m-0">
+
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <!-- end page title -->
+
+                <div class="row">
+                    <div class="col-xl-4 col-lg-4">
+                        <div class="card text-center">
+                            {% for item in queryset %}
+                                <div class="card-body">
+                                    <img src="{{ stu_info.avatar }}" class="rounded-circle avatar-lg img-thumbnail"
+                                         alt="profile-image">
+                                    <h4 class="mb-1 mt-2">{{ item.username }}</h4>
+                                    <p class="text-muted">{{ item.get_role_display }}</p>
+
+                                    <div class="text-start mt-3">
+                                        <h4 class="fs-13 text-uppercase">个人信息：</h4>
+                                        <p class="text-muted mb-3">
+                                            一名普通的学生
+                                        </p>
+                                        <p class="text-muted mb-2"><strong>学号：</strong> <span
+                                                class="ms-2">{{ item.student_no }}</span>
+                                        </p>
+
+                                        <p class="text-muted mb-2"><strong>手机号：</strong> <span
+                                                class="ms-2 ">{{ item.phone }}</span>
+                                        </p>
+                                        <p class="text-muted mb-2"><strong>班级：</strong> <span
+                                                class="ms-2">{{ item.classs.name }}</span>
+                                        </p>
+                                        <p class="text-muted mb-2"><strong>状态：</strong> <span
+                                                class="ms-2">{{ item.get_status_display }}</span>
+                                        </p>
+                                        <p class="text-muted mb-2"><strong>意向城市：</strong> <span
+                                                class="ms-2">{{ item.get_province_display }}</span>
+                                        </p>
+                                    </div>
+
+                                    <ul class="social-list list-inline mt-3 mb-0">
+                                        <li class="list-inline-item">
+                                            <a href="javascript: void(0);"
+                                               class="social-list-item border-primary text-primary"><i
+                                                    class="ri-facebook-circle-fill"></i></a>
+                                        </li>
+                                        <li class="list-inline-item">
+                                            <a href="javascript: void(0);"
+                                               class="social-list-item border-danger text-danger"><i
+                                                    class="ri-google-fill"></i></a>
+                                        </li>
+                                        <li class="list-inline-item">
+                                            <a href="javascript: void(0);"
+                                               class="social-list-item border-info text-info"><i
+                                                    class="ri-twitter-fill"></i></a>
+                                        </li>
+                                        <li class="list-inline-item">
+                                            <a href="javascript: void(0);"
+                                               class="social-list-item border-secondary text-secondary"><i
+                                                    class="ri-github-fill"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-xl-8 col-lg-8">
+                        <div class="card">
+                            <div class="card-body">
+                                <ul class="nav nav-pills bg-nav-pills nav-justified mb-3">
+                                    <li class="nav-item">
+                                        <a href="#INFO" data-bs-toggle="tab" aria-expanded="false"
+                                           class="nav-link rounded-start rounded-0 active">
+                                            个人信息
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#CLASSMATES" data-bs-toggle="tab" aria-expanded="true"
+                                           class="nav-link rounded-0">
+                                            同学
+                                        </a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content">
+
+                                    {# 同班同学的列表   #}
+                                    <div class="tab-pane " id="CLASSMATES">
+                                        <h5 class="text-uppercase mb-3"><i class="ri-briefcase-line me-1"></i>
+                                            CLASSMATES</h5>
+                                        <div class="table-responsive">
+                                            <table id="alternative-page-datatable"
+                                                   class="table table-sm table-bordered  table-centered table-hover table-borderless mb-0">
+                                                <thead class="border-top border-bottom bg-light-subtle border-light">
+                                                <tr>
+                                                    <th>id</th>
+                                                    <th>用户</th>
+                                                    <th>学号</th>
+                                                    <th>手机号</th>
+                                                    <th>就业去向</th>
+                                                    <th>意向城市</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for classmate in classmates %}
+                                                    <tr>
+                                                        <td>{{ classmate.id }}</td>
+                                                        <td><img src="/media/{{ classmate.avatar }}"
+                                                                 alt="table-user"
+                                                                 class="me-2 rounded-circle"
+                                                                 height="24"> {{ classmate.username }}</td>
+                                                        <td>{{ classmate.student_no }}</td>
+                                                        <td>{{ classmate.phone }}</td>
+                                                        <td>{{ classmate.get_status_display }}</td>
+                                                        <td>{{ classmate.get_province_display }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    {# 修改个人信息 #}
+                                    <div class="tab-pane show active" id="INFO">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <form id="editINFO" action="/student/index/"
+                                                              enctype='multipart/form-data' method="post">
+                                                            {% csrf_token %}
+                                                            <div class="row">
+                                                                {% for item in queryset %}
+                                                                    <div class="col-lg-6">
+                                                                        <div class="mb-3">
+                                                                            <label for="simpleinput"
+                                                                                   class="form-label">学号</label>
+                                                                            <input type="text" id="simpleinput"
+                                                                                   class="form-control"
+                                                                                   value="{{ item.student_no }}"
+                                                                                   name="student_no"
+                                                                                   disabled>
+                                                                        </div>
+
+                                                                        <div class="mb-3">
+                                                                            <label for="example-username"
+                                                                                   class="form-label">用户名</label>
+                                                                            <input type="text" id="username"
+                                                                                   class="form-control"
+                                                                                   value="{{ item.username }}"
+                                                                                   name="username">
+                                                                            <span class="text-danger span-username"
+                                                                                  style="position: absolute; display: none;">用户名不能为空！</span>
+                                                                        </div>
+
+                                                                        <div class="mb-3">
+                                                                            <label for="example-select"
+                                                                                   class="form-label">毕业去向</label>
+                                                                            <select class="form-control" name="status">
+                                                                                <option value="{{ item.status }}">{{ item.get_status_display }}</option>
+                                                                                <optgroup
+                                                                                        label="选择去向">
+                                                                                    <option value="0">就业</option>
+                                                                                    <option value="1">升学</option>
+                                                                                </optgroup>
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="mb-3">
+                                                                            <label for="example-fileinput"
+                                                                                   class="form-label">选择头像</label>
+                                                                            <input type="file" id="example-fileinput"
+                                                                                   class="form-control" name="pic">
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="col-lg-6">
+                                                                        <div class="mb-3" style="position: relative">
+                                                                            <label for="example-palaceholder"
+                                                                                   class="form-label">手机号</label>
+                                                                            <input type="text" id="example-palaceholder"
+                                                                                   class="form-control"
+                                                                                   placeholder="输入您的手机号"
+                                                                                   value="{{ item.phone }}"
+                                                                                   name="phone">
+                                                                            <span class="text-danger span-phone"
+                                                                                  style="position: absolute; display: none;">请输入有效的 11 位手机号!</span>
+                                                                            {% if messages %}
+                                                                                {% for message in messages %}
+                                                                                    <div class="alert alert-{{ message.tags }} mt-1">
+                                                                                        {{ message }}
+                                                                                    </div>
+                                                                                {% endfor %}
+                                                                            {% endif %}
+                                                                        </div>
+                                                                        <div class="mb-3">
+                                                                            <label for="simpleinput"
+                                                                                   class="form-label">班级</label>
+                                                                            <input type="text" id="simpleinput"
+                                                                                   class="form-control"
+                                                                                   value="{{ item.classs.name }}"
+                                                                                   name="classs_name"
+                                                                                   disabled>
+                                                                        </div>
+                                                                        <div class="mb-4">
+                                                                            <label for="simpleinput" class="form-label">意向地区</label>
+                                                                            <select class="form-control"
+                                                                                    id="simpleinput" name="province">
+                                                                                <option value="{{ item.province }}"
+                                                                                        selected>{{ item.get_province_display }}</option>
+                                                                                <option value="0">北京市</option>
+                                                                                <option value="1">天津市</option>
+                                                                                <option value="2">河北省</option>
+                                                                                <option value="3">山西省</option>
+                                                                                <option value="4">内蒙古自治区</option>
+                                                                                <option value="5">辽宁省</option>
+                                                                                <option value="6">吉林省</option>
+                                                                                <option value="7">黑龙江省</option>
+                                                                                <option value="8">上海市</option>
+                                                                                <option value="9">江苏省</option>
+                                                                                <option value="10">浙江省</option>
+                                                                                <option value="11">安徽省</option>
+                                                                                <option value="12">福建省</option>
+                                                                                <option value="13">江西省</option>
+                                                                                <option value="14">山东省</option>
+                                                                                <option value="15">河南省</option>
+                                                                                <option value="16">湖北省</option>
+                                                                                <option value="17">湖南省</option>
+                                                                                <option value="18">广东省</option>
+                                                                                <option value="19">广西壮族自治区
+                                                                                </option>
+                                                                                <option value="20">海南省</option>
+                                                                                <option value="21">重庆市</option>
+                                                                                <option value="22">四川省</option>
+                                                                                <option value="23">贵州省</option>
+                                                                                <option value="24">云南省</option>
+                                                                                <option value="25">西藏自治区</option>
+                                                                                <option value="26">陕西省</option>
+                                                                                <option value="27">甘肃省</option>
+                                                                                <option value="28">青海省</option>
+                                                                                <option value="29">宁夏回族自治区
+                                                                                </option>
+                                                                                <option value="30">新疆维吾尔自治区
+                                                                                </option>
+                                                                                <option value="31">台湾省</option>
+                                                                                <option value="32">香港特别行政区
+                                                                                </option>
+                                                                                <option value="33">澳门特别行政区
+                                                                                </option>
+                                                                            </select>
+                                                                        </div>
+
+                                                                        <br>
+                                                                        <div class="mb-3">
+                                                                            <button type="submit"
+                                                                                    class="btn btn-primary w-md">保存
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                    </div>
+
+                                                                {% endfor %}
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                                <!-- end row-->
+                                            </div> <!-- end card-body -->
+                                        </div> <!-- end card -->
+                                    </div><!-- end col -->
+                                </div><!-- end row -->
+                            </div>
+                            <!-- end timeline content-->
+                        </div>
+                    </div> <!-- end card -->
+                </div> <!-- end col -->
+            </div>
+            <!-- end row-->
+
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            $('#editINFO').on('submit', function (event) {
+                const $phoneInput = $('#example-palaceholder');
+                const $usernameInput = $('#username');
+                const $usernameErrorSpan = $('.span-username');
+
+                // 检查手机号码是否合法
+                const isValidPhone = function (phone) {
+                    phone = phone.trim();
+                    return /^\d{11}$/.test(phone);
+                };
+                if (!isValidPhone($phoneInput.val())) {
+                    event.preventDefault();
+                    $('.span-phone').show();
+                } else {
+                    $('.span-phone').hide();
+                }
+                // 检查用户名是否为空
+                if (!$usernameInput.val()) {
+                    event.preventDefault();
+                    $usernameErrorSpan.show();
+                } else {
+                    $usernameErrorSpan.hide();
+                }
+                // 如果手机号码、密码和用户名都合法,则允许表单提交
+                if (isValidPhone($phoneInput.val()) && $usernameInput.val()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+        });
+    </script>
+    <script>
+        $(function () {
+            // 清除红点的方法
+            bindClearNotice();
+
+        })
+
+        function bindClearNotice() {
+            $('#clearAllNotice').click(function () {
+                {#只需要发送一个请求#}
+                $.ajax({
+                    url: '/student/clear_notice/',
+                    method: "POST",
+                    data: {},
+                    dataType: "JSON",
+                    success: function (res) {
+                        if (res.status) {
+                            $('.noti-icon-badge').attr('class', '');
+                        }
+                    }
+                })
+            });
+        }
+
+    </script>
+{% endblock %}

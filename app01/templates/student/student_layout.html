@@ -1,0 +1,638 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-layout-mode="detached">
+<head>
+    <meta charset="utf-8"/>
+    <title>应届生去向系统 | 学生端</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description"/>
+    <meta content="Coderthemes" name="author"/>
+
+    <link rel="shortcut icon" href="{% static 'assets/images/favicon.ico' %}">
+    <link href="{% static 'assets/vendor/select2/css/select2.min.css' %}" rel="stylesheet" type="text/css"/>
+
+    <!-- Datatables css -->
+    <link href="{% static 'assets/vendor/datatables.net-bs5/css/dataTables.bootstrap5.min.css' %}" rel="stylesheet"
+          type="text/css"/>
+    <link href="{% static 'assets/vendor/datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css' %}"
+          rel="stylesheet"
+          type="text/css"/>
+    <link href="{% static 'assets/vendor/datatables.net-fixedcolumns-bs5/css/fixedColumns.bootstrap5.min.css' %}"
+          rel="stylesheet"
+          type="text/css"/>
+    <link href="{% static 'assets/vendor/datatables.net-fixedheader-bs5/css/fixedHeader.bootstrap5.min.css' %}"
+          rel="stylesheet"
+          type="text/css"/>
+    <link href="{% static 'assets/vendor/datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css' %}" rel="stylesheet"
+          type="text/css"/>
+    <link href="{% static 'assets/vendor/datatables.net-select-bs5/css/select.bootstrap5.min.css' %}" rel="stylesheet"
+          type="text/css"/>
+
+    <link href="{% static 'assets/vendor/bootstrap-touchspin/jquery.bootstrap-touchspin.min.css' %}" rel="stylesheet"
+          type="text/css"/>
+
+    <link rel="stylesheet" href="{% static 'assets/vendor/daterangepicker/daterangepicker.css' %}">
+
+    <link rel="stylesheet"
+          href="{% static 'assets/vendor/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css' %}">
+
+    <script src="{% static 'assets/js/config.js' %}"></script>
+
+    <link href="{% static 'assets/css/app.min.css' %}" rel="stylesheet" type="text/css" id="app-style"/>
+
+    <link href="{% static 'assets/css/icons.min.css' %}" rel="stylesheet" type="text/css"/>
+</head>
+
+<body>
+<!-- wrapper START -->
+<div class="wrapper">
+
+    <!-- 顶栏开始 -->
+    <div class="navbar-custom">
+        <div class="topbar container-fluid">
+            <div class="d-flex align-items-center gap-lg-2 gap-1">
+
+                <!-- Topbar Brand Logo -->
+                <div class="logo-topbar">
+                    <!-- Logo light -->
+                    <a href="#" class="logo-light">
+                            <span class="logo-lg">
+                                <img src="{% static 'assets/images/logo.png' %}" alt="logo">
+                            </span>
+                        <span class="logo-sm">
+                                <img src="{% static 'assets/images/logo-sm.png' %}" alt="small logo">
+                            </span>
+                    </a>
+
+                    <!-- Logo Dark -->
+                    <a href="#" class="logo-dark">
+                            <span class="logo-lg">
+                                <img src="{% static 'assets/images/logo1.png' %}" alt="dark logo">
+                            </span>
+                        <span class="logo-sm">
+                                <img src="{% static 'assets/images/logo-sm.png' %}" alt="small logo">
+                            </span>
+                    </a>
+                </div>
+
+                <!-- Sidebar Menu Toggle Button -->
+                <button class="button-toggle-menu">
+                    <i class="ri-menu-2-fill"></i>
+                </button>
+
+                <!-- Horizontal Menu Toggle Button -->
+                <button class="navbar-toggle" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
+                    <div class="lines">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </button>
+            </div>
+            <ul class="topbar-menu d-flex align-items-center gap-3">
+
+                {% block notice %}
+
+                {% endblock %}
+
+                <li class="d-none d-sm-inline-block">
+                    <a class="nav-link" data-bs-toggle="offcanvas" href="#theme-settings-offcanvas">
+                        <i class="ri-settings-3-fill fs-22"></i>
+                    </a>
+                </li>
+
+                <li class="d-none d-sm-inline-block">
+                    <div class="nav-link" id="light-dark-mode">
+                        <i class="ri-moon-fill fs-22"></i>
+                    </div>
+                </li>
+
+
+                <li class="d-none d-md-inline-block">
+                    <a class="nav-link" href="" data-toggle="fullscreen">
+                        <i class="ri-fullscreen-line fs-22"></i>
+                    </a>
+                </li>
+
+                <li class="dropdown me-md-2">
+                    <a class="nav-link dropdown-toggle arrow-none nav-user px-2" data-bs-toggle="dropdown" href="#"
+                       role="button" aria-haspopup="false" aria-expanded="false">
+                            <span class="account-user-avatar">
+                                <img src="{{ stu_info.avatar }}" alt="user-image" width="32"
+                                     class="rounded-circle">
+                            </span>
+                        <span class="d-lg-flex flex-column gap-1 d-none">
+                                <h5 class="my-0">{{ stu_info.username }}</h5>
+                                <h6 class="my-0 fw-normal">
+                                    {% if stu_info.role == 0 %}老师
+                                    {% elif stu_info.role == 1 %}学生
+                                    {% endif %}
+                                </h6>
+                            </span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated profile-dropdown">
+                        <!-- item-->
+                        <div class=" dropdown-header noti-title">
+                            <h6 class="text-overflow m-0">欢迎 !</h6>
+                        </div>
+                        <!-- item-->
+                        <button class="btn dropdown-item" data-bs-toggle="modal"
+                                data-bs-target="#login-modal">
+                            <i class=" ri-lock-password-line align-middle me-1"></i>
+                            <span>修改密码</span>
+                        </button>
+
+                        <a href="/logout/" class="dropdown-item">
+                            <i class="ri-logout-box-fill align-middle me-1"></i>
+                            <span>注销</span>
+                        </a>
+                    </div>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+
+
+    <!-- 修改密码模态框 -->
+    <div id="login-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="multiple-oneModalLabel">修改密码</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editPassword" action="#" novalidate
+                          class="ps-3 pe-3">
+                        <!-- 单独地修改密码模态框 -->
+                        <div class="mb-3">
+                            <label for="password"
+                                   class="form-label">密码</label>
+                            <div class="input-group input-group-merge">
+                                <input type="password" id="password"
+                                       class="form-control"
+                                       placeholder="输入您的新密码"
+                                       name="password">
+                                <div class="input-group-text"
+                                     data-password="false">
+                                    <span class="password-eye"></span>
+                                </div>
+                            </div>
+                            <span class="text-danger span-password"
+                                  style="position: absolute; display: none;">密码需六位数以上！</span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password"
+                                   class="form-label">确认密码</label>
+                            <div class="input-group input-group-merge">
+                                <input type="password" id="repassword"
+                                       class="form-control"
+                                       placeholder="确定您的密码"
+                                       name="repassword">
+                                <div class="input-group-text"
+                                     data-password="false">
+                                    <span class="password-eye"></span>
+                                </div>
+                            </div>
+                            <span class="text-danger span-repassword"
+                                  style="position: absolute; display: none;">密码需六位数以上！</span>
+                            <br>
+                            <span class="text-danger error-password"
+                                  style="position: absolute;;display: none;"></span>
+                        </div>
+                        <br>
+                        <div class="mb-3">
+                            <button type="submit" id="btnEDIT"
+                                    class="btn btn-primary w-md">保存
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div>
+
+    <!-- 顶栏结束 -->
+
+    <!-- ========== 左侧栏开始 Start ========== -->
+    <div class="leftside-menu">
+
+        <!-- Brand Logo Light -->
+        <a href="#" class="logo logo-light">
+                <span class="logo-lg">
+                    <img src="{% static 'assets/images/logo.png' %}" alt="logo">
+                </span>
+            <span class="logo-sm">
+                    <img src="{% static 'assets/images/logo-sm.png' %}" alt="small logo">
+                </span>
+        </a>
+
+        <!-- Brand Logo Dark -->
+        <a href="#" class="logo logo-dark">
+                <span class="logo-lg">
+                    <img src="{% static 'assets/images/logo1.png' %}" alt="dark logo">
+                </span>
+            <span class="logo-sm">
+                    <img src="{% static 'assets/images/logo-sm.png' %}" alt="small logo">
+                </span>
+        </a>
+
+        <!-- Sidebar Hover Menu Toggle Button -->
+        <div class="button-sm-hover" data-bs-toggle="tooltip" data-bs-placement="right" title="Show Full Sidebar">
+            <i class="ri-checkbox-blank-circle-line align-middle"></i>
+        </div>
+
+        <!-- Full Sidebar Menu Close Button -->
+        <div class="button-close-fullsidebar">
+            <i class="ri-close-fill align-middle"></i>
+        </div>
+
+        <!-- Sidebar -left -->
+        <div class="h-100" id="leftside-menu-container" data-simplebar>
+            <!-- Leftbar User -->
+            <div class="leftbar-user p-3 text-white">
+                <a href="#" class="d-flex align-items-center text-reset">
+                    <div class="flex-shrink-0">
+                        <img src="{{ stu_info.avatar }}" alt="user-image" height="42"
+                             class="rounded-circle shadow">
+                    </div>
+                    <div class="flex-grow-1 ms-2">
+                        <span class="fw-semibold fs-15 d-block">{{ stu_info.username }}</span>
+                        <span class="fs-13">{% if stu_info.role == 0 %}老师
+                        {% elif stu_info.role == 1 %}学生
+                        {% endif %}</span>
+                    </div>
+                    <div class="ms-auto">
+                        <i class="ri-arrow-right-s-fill fs-20"></i>
+                    </div>
+                </a>
+            </div>
+
+            <!--- 侧边菜单 -->
+            <ul class="side-nav">
+
+                <li class="side-nav-title mt-1"> 常用</li>
+
+                <li class="side-nav-item">
+                    <a href="/student/index/" class="side-nav-link">
+                        <i class="ri-dashboard-2-fill"></i>
+                        <span> 个人信息 </span>
+                    </a>
+                </li>
+
+                <li class="side-nav-item">
+                    <a data-bs-toggle="collapse" href="#sidebarTables" aria-expanded="false"
+                       aria-controls="sidebarTables" class="side-nav-link">
+                        <i class="ri-table-fill"></i>
+                        <span> 功能 </span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="collapse" id="sidebarTables">
+                        <ul class="side-nav-second-level">
+                            <li>
+                                <a href="/student/china/">学生意向地区</a>
+                            </li>
+                            <li>
+                                <a href="/student/notice/">查看通知</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+            <!--- End Sidemenu -->
+            <div class="clearfix"></div>
+        </div>
+    </div>
+    <!-- ========== 左侧栏结束 End ========== -->
+
+
+    <!-- 内容开始 -->
+    {% block content %}
+    {% endblock %}
+    <!-- 内容结束 -->
+</div>
+
+</div>
+<!-- END wrapper -->
+
+<!-- 主题 设置 -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="theme-settings-offcanvas">
+    <div class="d-flex align-items-center bg-primary p-3 offcanvas-header">
+        <h5 class="text-white m-0">Theme Settings</h5>
+        <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="offcanvas"
+                aria-label="Close"></button>
+    </div>
+
+    <div class="offcanvas-body p-0">
+        <div data-simplebar class="h-100">
+            <div class="card mb-0 p-3">
+                <div class="alert alert-warning" role="alert">
+                    <strong>Customize </strong> the overall color scheme, sidebar menu, etc.
+                </div>
+
+                <h5 class="mt-0 fs-16 fw-bold mb-3">Choose Layout</h5>
+                <div class="d-flex flex-column gap-2">
+                    <div class="form-check form-switch">
+                        <input id="customizer-layout01" name="data-layout" type="checkbox" value="vertical"
+                               class="form-check-input">
+                        <label class="form-check-label" for="customizer-layout01">Vertical</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input id="customizer-layout02" name="data-layout" type="checkbox" value="horizontal"
+                               class="form-check-input">
+                        <label class="form-check-label" for="customizer-layout02">Horizontal</label>
+                    </div>
+                </div>
+
+                <h5 class="my-3 fs-16 fw-bold">Color Scheme</h5>
+
+                <div class="d-flex flex-column gap-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="data-bs-theme" id="layout-color-light"
+                               value="light">
+                        <label class="form-check-label" for="layout-color-light">Light</label>
+                    </div>
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="data-bs-theme" id="layout-color-dark"
+                               value="dark">
+                        <label class="form-check-label" for="layout-color-dark">Dark</label>
+                    </div>
+                </div>
+
+                <div id="layout-width">
+                    <h5 class="my-3 fs-16 fw-bold">Layout Mode</h5>
+
+                    <div class="layout-fluid">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="data-layout-mode"
+                                   id="layout-mode-fluid" value="fluid">
+                            <label class="form-check-label" for="layout-mode-fluid">Fluid</label>
+                        </div>
+
+                        <div id="layout-boxed">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="data-layout-mode"
+                                       id="layout-mode-boxed" value="boxed">
+                                <label class="form-check-label" for="layout-mode-boxed">Boxed</label>
+                            </div>
+                        </div>
+
+                        <div id="d-flex flex-column gap-2">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="data-layout-mode"
+                                       id="data-layout-detached" value="detached">
+                                <label class="form-check-label" for="data-layout-detached">Detached</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="my-3 fs-16 fw-bold">Topbar Color</h5>
+
+                <div class="d-flex flex-column gap-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="data-topbar-color"
+                               id="topbar-color-light" value="light">
+                        <label class="form-check-label" for="topbar-color-light">Light</label>
+                    </div>
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="data-topbar-color"
+                               id="topbar-color-dark" value="dark">
+                        <label class="form-check-label" for="topbar-color-dark">Dark</label>
+                    </div>
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="data-topbar-color"
+                               id="topbar-color-brand" value="brand">
+                        <label class="form-check-label" for="topbar-color-brand">Brand</label>
+                    </div>
+                </div>
+
+                <div>
+                    <h5 class="my-3 fs-16 fw-bold">Menu Color</h5>
+
+                    <div class="d-flex flex-column gap-2">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="data-menu-color"
+                                   id="leftbar-color-light" value="light">
+                            <label class="form-check-label" for="leftbar-color-light">Light</label>
+                        </div>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="data-menu-color"
+                                   id="leftbar-color-dark" value="dark">
+                            <label class="form-check-label" for="leftbar-color-dark">Dark</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="data-menu-color"
+                                   id="leftbar-color-brand" value="brand">
+                            <label class="form-check-label" for="leftbar-color-brand">Brand</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="sidebar-size">
+                    <h5 class="my-3 fs-16 fw-bold">Sidebar Size</h5>
+
+                    <div class="d-flex flex-column gap-2">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="data-sidenav-size"
+                                   id="leftbar-size-default" value="default">
+                            <label class="form-check-label" for="leftbar-size-default">Default</label>
+                        </div>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="data-sidenav-size"
+                                   id="leftbar-size-compact" value="compact">
+                            <label class="form-check-label" for="leftbar-size-compact">Compact</label>
+                        </div>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="data-sidenav-size"
+                                   id="leftbar-size-small" value="condensed">
+                            <label class="form-check-label" for="leftbar-size-small">Condensed</label>
+                        </div>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="data-sidenav-size"
+                                   id="leftbar-size-small-hover" value="sm-hover">
+                            <label class="form-check-label" for="leftbar-size-small-hover">Hover View</label>
+                        </div>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="data-sidenav-size"
+                                   id="leftbar-size-full" value="full">
+                            <label class="form-check-label" for="leftbar-size-full">Full Layout</label>
+                        </div>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="data-sidenav-size"
+                                   id="leftbar-size-fullscreen" value="fullscreen">
+                            <label class="form-check-label" for="leftbar-size-fullscreen">Fullscreen Layout</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="layout-position">
+                    <h5 class="my-3 fs-16 fw-bold">Layout Position</h5>
+
+                    <div class="btn-group checkbox" role="group">
+                        <input type="radio" class="btn-check" name="data-layout-position" id="layout-position-fixed"
+                               value="fixed">
+                        <label class="btn btn-soft-primary w-sm" for="layout-position-fixed">Fixed</label>
+
+                        <input type="radio" class="btn-check" name="data-layout-position"
+                               id="layout-position-scrollable" value="scrollable">
+                        <label class="btn btn-soft-primary w-sm ms-0"
+                               for="layout-position-scrollable">Scrollable</label>
+                    </div>
+                </div>
+
+                <div id="sidebar-user">
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <label class="fs-16 fw-bold m-0" for="sidebaruser-check">Sidebar User Info</label>
+                        <div class="form-check form-switch">
+                            <input type="checkbox" class="form-check-input" name="sidebar-user"
+                                   id="sidebaruser-check">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="offcanvas-footer border-top p-3 text-center">
+        <div class="row">
+            <div class="col-6">
+                <button type="button" class="btn btn-light w-100" id="reset-layout">Reset</button>
+            </div>
+            <div class="col-6">
+                <a href="#" role="button" class="btn btn-primary w-100">Buy Now</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+</body>
+
+{% block js %}
+{% endblock %}
+<script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        $('#editPassword').on('submit', function (event) {
+            const $passwordInput = $('#password');
+            const $passwordErrorSpan = $('.span-password');
+            const $repasswordErrorSpan = $('.span-repassword')
+            const $repasswordInput = $('#repassword');
+            // 检查密码长度是否合法
+            const isValidPassword = function (password) {
+                return password.length >= 6;
+            };
+
+            if (!isValidPassword($passwordInput.val())) {
+                event.preventDefault();
+                $passwordErrorSpan.show();
+            } else {
+                $passwordErrorSpan.hide();
+            }
+
+            if (!isValidPassword($repasswordInput.val())) {
+                event.preventDefault();
+                $repasswordErrorSpan.show();
+            } else {
+                $repasswordErrorSpan.hide();
+            }
+
+            // 如果手机号码、密码和用户名都合法,则允许表单提交
+            if (isValidPassword($passwordInput.val()) && isValidPassword($repasswordInput)) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+    });
+</script>
+<script>
+    $(function () {
+        editPassword();
+    })
+
+    function editPassword() {
+        $('#btnEDIT').click(function () {
+            $.ajax({
+                url: '/student/edit/password/',
+                type: 'post',
+                data: $('#editPassword').serialize(),
+                dataType: 'JSON',
+                success: function (res) {
+                    if (res.status) {
+                        alert('密码更新成功！')
+                        location.reload();
+                    } else {
+                        $('.error-password').css('display', 'block');
+                        $('.error-password').text(res.error);
+                    }
+                }
+            })
+        })
+    }
+</script>
+<script src="{% static 'assets/js/vendor.min.js' %}"></script>
+<script src="{% static 'assets/vendor/daterangepicker/moment.min.js' %}"></script>
+<script src="{% static 'assets/vendor/daterangepicker/daterangepicker.js' %}"></script>
+<script src="{% static 'assets/vendor/select2/js/select2.min.js' %}"></script>
+
+<!-- Datatables js -->
+<script src="{% static 'assets/vendor/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables.net-bs5/js/dataTables.bootstrap5.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables.net-responsive-bs5/js/responsive.bootstrap5.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables.net-fixedcolumns-bs5/js/fixedColumns.bootstrap5.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables.net-buttons-bs5/js/buttons.bootstrap5.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables.net-buttons/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables.net-buttons/js/buttons.flash.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables.net-buttons/js/buttons.print.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables.net-keytable/js/dataTables.keyTable.min.js' %}"></script>
+<script src="{% static 'assets/vendor/datatables.net-select/js/dataTables.select.min.js' %}"></script>
+
+<!-- Datatable Demo Aapp js -->
+<script src="{% static 'assets/js/pages/demo.datatable-init.js' %}"></script>
+
+<!-- Bootstrap Wizard Form js -->
+<script src="{% static 'assets/vendor/twitter-bootstrap-wizard/jquery.bootstrap.wizard.min.js' %}"></script>
+
+<!-- Wizard Form Demo js -->
+<script src="{% static 'assets/js/pages/demo.form-wizard.js' %}"></script>
+
+<!-- App js -->
+<script src="{% static 'assets/js/pages/demo.dashboard.js' %}"></script>
+<script src="{% static 'assets/js/app.min.js' %}"></script>
+<script>
+    const exampleModal = document.getElementById('exampleModal')
+    exampleModal.addEventListener('show.bs.modal', event => {
+        // Button that triggered the modal
+        const button = event.relatedTarget
+        // Extract info from data-bs-* attributes
+        const recipient = button.getAttribute('data-bs-whatever')
+        // If necessary, you could initiate an AJAX request here
+        // and then do the updating in a callback.
+        //
+        // Update the modal's content.
+        const modalTitle = exampleModal.querySelector('.modal-title')
+        const modalBodyInput = exampleModal.querySelector('.modal-body input')
+
+        modalTitle.textContent = `New message to ${recipient}`
+        modalBodyInput.value = recipient
+    })
+</script>
+<!-- Vendor js -->
+</html>

@@ -1,0 +1,254 @@
+{% extends 'teacher/teacher_layout.html' %}
+{% load static %}
+{% block content %}
+    <div class="content-page">
+        <div class="content">
+
+            <!-- Start Content-->
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="page-title-box justify-content-between d-flex align-items-md-center flex-md-row flex-column">
+                            <h4 class="page-title">班级学生详情</h4>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xl-5">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="header-title"></h4>
+                                <div id="ltr">
+                                    <div id="m1" style="width: 100%;height: 380px">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end card body-->
+                        </div>
+                        <!-- end card -->
+                    </div>
+                    <div class="col-xl-7">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="header-title"></h4>
+                                <div id="ltr">
+                                    <div id="m2" style="width: 100%;height: 500px">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end card body-->
+                        </div>
+                        <!-- end card -->
+                    </div>
+                </div>
+
+                <!-- end row-->
+            </div>
+            <!-- end row-->
+
+        </div>
+        <!-- container -->
+
+    </div>
+{% endblock %}
+{% block js %}
+    <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'assets/js/echarts.js' %}"></script>
+    <script src="{% static 'assets/js/macarons.js' %}"></script>
+    <script>
+        $(function () {
+            // 初始化 ECharts 实例
+            Echarts1();
+            Echarts2();
+        });
+
+
+        function Echarts1() {
+            var myChart = echarts.init(document.getElementById('m1'), 'macarons');
+            var option;
+
+            option = {
+                title: {
+                    text: '班级人数详情',
+                    left: 'center',
+                },
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    orient: 'horizontal',
+                    bottom: 'bottom',
+                },
+                series: [
+                    {
+                        name: '人数',
+                        type: 'pie',
+                        radius: '50%',
+                        data: [
+                            {value: 1048, name: 'Search Engine'},
+                            {value: 735, name: 'Direct'},
+                            {value: 580, name: 'Email'},
+                            {value: 484, name: 'Union Ads'},
+                            {value: 300, name: 'Video Ads'}
+                        ],
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+
+            $.ajax({
+                url: "/teacher_manage_classes/",
+                type: "get",
+                dataType: "JSON",
+                success: function (res) {
+                    if (res.status) {
+                        option.series[0].data = Object.entries(res.classes).map(([name, value]) => ({
+                            value,
+                            name
+                        }));
+                        myChart.setOption(option);
+                    }
+                }
+            })
+
+            option && myChart.setOption(option);
+            // 设置 ECharts 图表选项
+            myChart.setOption(option);
+            // 自适应大小
+            window.onresize = function () {
+                myChart.resize();
+            }
+        }
+
+        function Echarts2() {
+            var myChart = echarts.init(document.getElementById('m2'), 'macarons');
+
+            var option;
+
+            option = {
+                title: {
+                    text: '班级毕业去向详情',
+                    left: '7%',
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        crossStyle: {
+                            color: '#000000'
+                        }
+                    }
+                },
+                legend: {
+                    data: ['就业', '升学', '总人数'],
+                    left: 'center'
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        // 班级坐标
+                        data: [],
+                        axisPointer: {
+                            type: 'shadow'
+                        },
+                        axisLabel: {
+                            rotate: 45 //旋转的角度从 -90 度到 90 度。
+                        },
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '人数',
+                        min: 0,
+                        max: 54,
+                        interval: 5,
+                        axisLabel: {
+                            formatter: '{value} '
+                        }
+                    },
+                    {
+                        type: 'value',
+                        name: '',
+                        min: 0,
+                        max: 54,
+                        interval: 5,
+                        axisLabel: {
+                            formatter: ' '
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: '总人数',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        tooltip: {
+                            valueFormatter: function (value) {
+                                return value + ' 人';
+                            }
+                        },
+                        // 每个班级的总人数
+                        data: [40, 50, 45]
+                    },
+                    {
+                        name: '就业',
+                        type: 'bar',
+                        tooltip: {
+                            valueFormatter: function (value) {
+                                return value;
+                            }
+                        },
+                        // 就业人数
+                        data: [30, 15, 24]
+                    },
+                    {
+                        name: '升学',
+                        type: 'bar',
+                        tooltip: {
+                            valueFormatter: function (value) {
+                                return value;
+                            }
+                        },
+                        // 升学人数
+                        data: [10, 35, 21]
+                    }
+                ]
+            };
+            $.ajax({
+                url: "/teacher_classes_status/",
+                type: "get",
+                dataType: "JSON",
+                success: function (res) {
+                    if (res.status) {
+                        let classes = Object.keys(res.classes)
+                        let totalArr = [], employedArr = [], enrolledArr = [];
+                        Object.values(res.classes).forEach(item => {
+                            totalArr.push(item.total);
+                            employedArr.push(item.employed);
+                            enrolledArr.push(item.enrolled);
+                        });
+                        option.xAxis[0].data = classes
+                        option.series[0].data = totalArr;
+                        option.series[1].data = employedArr;
+                        option.series[2].data = enrolledArr;
+                        myChart.setOption(option);
+                    }
+                }
+            })
+            option && myChart.setOption(option);
+            myChart.setOption(option);
+            // 自适应大小
+            window.onresize = function () {
+                myChart.resize();
+            }
+        }
+    </script>
+{% endblock %}

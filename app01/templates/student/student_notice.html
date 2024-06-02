@@ -1,0 +1,153 @@
+{% extends 'student/student_layout.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="content-page">
+        <div class="content">
+            <!-- Start Content-->
+            <div class="container-fluid">
+
+                <!-- start page title -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="page-title-box justify-content-between d-flex align-items-md-center flex-md-row flex-column">
+                            <h4 class="page-title">通知</h4>
+                            <ol class="breadcrumb m-0">
+
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <!-- end page title -->
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="timeline" dir="ltr">
+                            <!-- 发布时间 -->
+                            <div class="timeline-show mb-3 text-center">
+                            </div>
+                            <!-- 发布的内容 -->
+                            {% if notices %}
+                                {% for notice in notices %}
+                                    {% if forloop.counter|divisibleby:2 %}
+                                        <div class="timeline-lg-item timeline-item-right">
+                                    {% else %}
+                                        <div class="timeline-lg-item timeline-item-left">
+                                    {% endif %}
+                                <div class="timeline-desk">
+                                    <div class="timeline-box getNotice" data-bs-toggle="modal"
+                                         data-bs-target="#primary-header-modal" data-sid="{{ notice.id }}">
+                                        <span class="arrow"></span>
+                                        <span class="timeline-icon bg-danger-subtle"><i
+                                                class="ri-record-circle-fill text-danger"></i></span>
+                                        <h4 class="mt-0 mb-1 fs-16">{{ notice.title }}</h4>
+                                        <p class="text-muted"><small>{{ notice.created_at|date:"Y-m-d H:i:s" }}</small>
+                                        </p>
+                                        <p>{{ notice.content|safe }} </p>
+                                        <div class="d-flex">
+                                            {% for laoshi in laoshi_info %}
+                                                <img src="/media/{{ laoshi.avatar }}"
+                                                     class="rounded-circle me-2" height="24">
+                                                <h5 class="mt-1 fs-14 mb-0">
+                                                    {{ laoshi.username }}
+                                                </h5>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center">
+                                    <h4>暂无通知</h4>
+                                </div>
+                            {% endif %}
+                            <!-- end timeline -->
+                            </div> <!-- end col -->
+                        </div>
+
+                        <!-- Primary Header Modal -->
+                        <div id="primary-header-modal" class="modal fade" tabindex="-1" role="dialog"
+                             aria-labelledby="primary-header-modalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header modal-colored-header bg-info">
+                                        <h2 class="modal-title" id="primary-header-modalLabel"></h2>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p style="font-size: 14px" id="primary-header-modal-date" class="text-muted">
+                                            <small></small>
+                                        <p id="primary-header-modal-content" style="font-size: 19px;"></p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">关闭
+                                        </button>
+                                    </div>
+                                </div><!-- /.modal-content -->
+                            </div><!-- /.modal-dialog -->
+                        </div><!-- /.modal -->
+                        <!-- end row -->
+
+                    </div> <!-- container -->
+
+                </div> <!-- content -->
+
+                <!-- Footer Start -->
+                <footer class="footer">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <script>document.write(new Date().getFullYear())</script>
+                                © HUAT - www.huat.edu.cn
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-md-end footer-links d-none d-md-block">
+                                    <a href="javascript: void(0);">关于</a>
+                                    <a href="javascript: void(0);">支持</a>
+                                    <a href="javascript: void(0);">联系我们</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+                <!-- end Footer -->
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"></script>
+    <script>
+        let EDIT_ID = null;
+        $(function () {
+            btnGetNotice();
+        })
+
+        function btnGetNotice() {
+            $('.getNotice').click(function () {
+                // 编辑之前先清除之前模态框表单内容
+                EDIT_ID = $(this).data('sid');
+                $.ajax({
+                    url: '/student/get/notice/',
+                    type: 'get',
+                    data: {
+                        sid: EDIT_ID
+                    },
+                    dataType: "JSON",
+                    success: function (res) {
+                        if (res.status) {
+                            $('#primary-header-modalLabel').text(res.data.title)
+                            $('#primary-header-modal-date').text(res.data.created_at)
+                            $('#primary-header-modal-content').text(res.data.content)
+                            console.log(res.data)
+                        }
+                    }
+                })
+            })
+        }
+    </script>
+{% endblock %}

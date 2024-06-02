@@ -1,0 +1,242 @@
+{% extends 'teacher/teacher_layout.html' %}
+{% load static %}
+{% block content %}
+    <div class="content-page">
+        <div class="content">
+            <!-- Start Content-->
+            <div class="container-fluid">
+                <!-- start page title -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="page-title-box justify-content-between d-flex align-items-md-center flex-md-row flex-column">
+                            <h4 class="page-title">个人信息</h4>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- end page title -->
+
+                <div class="row">
+                    <div class="col-xl-4 col-lg-4">
+                        <div class="card text-center">
+                            {% for item in queryset %}
+                                <div class="card-body">
+                                    <img src="{{ teacher_info.avatar }}" class="rounded-circle avatar-lg img-thumbnail"
+                                         alt="profile-image">
+                                    <h4 class="mb-1 mt-2">{{ item.username }}</h4>
+                                    <p class="text-muted">{{ item.get_role_display }}</p>
+
+                                    <div class="text-start mt-3">
+                                        <h4 class="fs-13 text-uppercase">个人信息：</h4>
+                                        <p class="text-muted mb-3">
+                                            一名普通的老师
+                                        </p>
+
+                                        <p class="text-muted mb-3" style="margin-bottom: 25px!important">
+                                            <strong>手机号：</strong> <span
+                                                class="ms-2 ">{{ item.phone }}</span>
+                                        </p>
+                                        <p class="text-muted mb-1"><strong>管理班级：</strong>
+                                            {% for classs in manage_class %}
+                                                <span class="ms-2">{{ classs.name }}</span>
+                                            {% endfor %}
+                                        </p>
+
+                                    </div>
+
+                                    <ul class="social-list list-inline mt-2 mb-0">
+                                        <li class="list-inline-item">
+                                            <a href="javascript: void(0);"
+                                               class="social-list-item border-primary text-primary"><i
+                                                    class="ri-facebook-circle-fill"></i></a>
+                                        </li>
+                                        <li class="list-inline-item">
+                                            <a href="javascript: void(0);"
+                                               class="social-list-item border-danger text-danger"><i
+                                                    class="ri-google-fill"></i></a>
+                                        </li>
+                                        <li class="list-inline-item">
+                                            <a href="javascript: void(0);"
+                                               class="social-list-item border-info text-info"><i
+                                                    class="ri-twitter-fill"></i></a>
+                                        </li>
+                                        <li class="list-inline-item">
+                                            <a href="javascript: void(0);"
+                                               class="social-list-item border-secondary text-secondary"><i
+                                                    class="ri-github-fill"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-xl-8 col-lg-8">
+                        <div class="card">
+                            <div class="card-body">
+                                <ul class="nav nav-pills bg-nav-pills nav-justified mb-3">
+                                    <li class="nav-item">
+                                        <a href="#MYINFO" data-bs-toggle="tab" aria-expanded="false"
+                                           class="nav-link rounded-start rounded-0 active">
+                                            我的信息
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#CLASSMATE" data-bs-toggle="tab" aria-expanded="true"
+                                           class="nav-link rounded-0">
+                                            同事信息
+                                        </a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content">
+                                    {# 修改个人信息 #}
+                                    <div class="tab-pane show active" id="MYINFO">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <form id="editINFO" method="post" enctype='multipart/form-data'>
+                                                            {% csrf_token %}
+                                                            <div class="row">
+                                                                {% for item in queryset %}
+                                                                    <div class="col-lg-6">
+                                                                        <div class="mb-4">
+                                                                            <label for="example-password"
+                                                                                   class="form-label">用户名</label>
+                                                                            <input type="text" id="username"
+                                                                                   class="form-control"
+                                                                                   placeholder="输入您的用户名"
+                                                                                   value="{{ item.username }}"
+                                                                                   name="username">
+                                                                            <span class="text-danger span-username"
+                                                                                  style="position: absolute; display: none;">用户名不能为空！</span>
+                                                                        </div>
+                                                                        <div class="mb-4">
+                                                                            <label for="example-fileinput"
+                                                                                   class="form-label">选择头像</label>
+                                                                            <input type="file" id="example-fileinput"
+                                                                                   class="form-control" name="pic">
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="col-lg-6">
+                                                                        <div class="mb-5" style="position: relative">
+                                                                            <label for="example-palaceholder"
+                                                                                   class="form-label">手机号</label>
+                                                                            <input type="text" id="example-palaceholder"
+                                                                                   class="form-control"
+                                                                                   placeholder="输入您的手机号"
+                                                                                   value="{{ item.phone }}"
+                                                                                   name="phone">
+                                                                            <span class="text-danger span-phone"
+                                                                                  style="position: absolute; display: none;">请输入有效的 11 位手机号!</span>
+                                                                            <p class="text-danger"
+                                                                               style="position: absolute;">{{ error_msg }}</p>
+                                                                            {% if messages %}
+                                                                                {% for message in messages %}
+                                                                                    <span class="alert alert-{{ message.tags }}"
+                                                                                          style="position: absolute;">
+                                                                                        {{ message }}
+                                                                                    </span>
+                                                                                {% endfor %}
+                                                                            {% endif %}
+                                                                        </div>
+
+                                                                        <div class="mb-1">
+                                                                            <button type="submit"
+                                                                                    class="btn btn-primary w-md">保存
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                    </div>
+
+                                                                {% endfor %}
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                                <!-- end row-->
+                                            </div> <!-- end card-body -->
+                                        </div> <!-- end card -->
+                                    </div><!-- end col -->
+
+                                    {# COLLEAGUE   #}
+                                    <div class="tab-pane" id="CLASSMATE">
+                                        <h5 class="text-uppercase mb-3"><i class="ri-briefcase-line me-1"></i>
+                                            COLLEAGUE</h5>
+                                        <div class="table-responsive">
+                                            <table id="basic-datatable"
+                                                   class="table table-sm table-bordered  table-centered table-hover table-borderless mb-0">
+                                                <thead class="border-top border-bottom bg-light-subtle border-light">
+                                                <tr>
+                                                    <th>id</th>
+                                                    <th>用户</th>
+                                                    <th>手机号</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for colleague in colleagues %}
+                                                    <tr>
+                                                        <td>{{ colleague.id }}</td>
+                                                        <td><img src="/media/{{ colleague.avatar }}"
+                                                                 alt="table-user"
+                                                                 class="me-2 rounded-circle"
+                                                                 height="24"> {{ colleague.username }}</td>
+                                                        <td>{{ colleague.phone }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    {# 修改个人信息 #}
+                                </div><!-- end row -->
+                            </div>
+                            <!-- end timeline content-->
+                        </div>
+
+
+                    </div> <!-- end card -->
+                </div> <!-- end col -->
+            </div>
+            <!-- end row-->
+
+        </div>
+        <!-- container -->
+    </div>
+{% endblock %}
+{% block js %}
+    <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            $('#editINFO').on('submit', function (event) {
+                const $phoneInput = $('#example-palaceholder');
+                const $usernameInput = $('#username');
+                const $usernameErrorSpan = $('.span-username');
+
+                // 检查手机号码是否合法
+                const isValidPhone = function (phone) {
+                    phone = phone.trim();
+                    return /^1\d{10}$/.test(phone);
+                };
+                if (!isValidPhone($phoneInput.val())) {
+                    event.preventDefault();
+                    $('.span-phone').show();
+                } else {
+                    $('.span-phone').hide();
+                }
+                // 检查用户名是否为空
+                if (!$usernameInput.val()) {
+                    event.preventDefault();
+                    $usernameErrorSpan.show();
+                } else {
+                    $usernameErrorSpan.hide();
+                }
+                // 如果手机号码、密码和用户名都合法,则允许表单提交
+                if (isValidPhone($phoneInput.val())  && $usernameInput.val()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+        });
+    </script>
+{% endblock %}

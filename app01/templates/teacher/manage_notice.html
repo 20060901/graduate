@@ -1,0 +1,271 @@
+{% extends 'teacher/teacher_layout.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="content-page">
+        <div class="content">
+
+            <!-- Start Content-->
+            <div class="container-fluid">
+
+                <!-- start page title -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="page-title-box justify-content-between d-flex align-items-md-center flex-md-row flex-column">
+                            <h4 class="page-title">通知</h4>
+                            <ol class="breadcrumb m-0">
+
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <!-- end page title -->
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="timeline" dir="ltr">
+                            <button id="btnAdd" class="btn btn-success btn-function" data-bs-toggle="modal"
+                                    data-bs-target="#signup-modal">
+                                发布通知
+                            </button>
+                            <!-- 发布时间 -->
+                            <div class="timeline-show mb-3 text-center">
+                            </div>
+
+                            <!-- 发布的内容 -->
+                            {% for notice in notices %}
+                                {% if forloop.counter|divisibleby:2 %}
+                                    <div class="timeline-lg-item timeline-item-right">
+                                {% else %}
+                                    <div class="timeline-lg-item timeline-item-left">
+                                {% endif %}
+                            <div class="timeline-desk">
+                                <div class="timeline-box">
+                                    <span class="arrow-alt"></span>
+                                    <span class="timeline-icon bg-danger-subtle"><i
+                                            class="ri-record-circle-fill text-danger"></i></span>
+                                    <h2 class="mt-0 mb-1 fs-30">{{ notice.title }}</h2>
+                                    <p class="text-muted"><small>{{ notice.created_at|date:"Y-m-d H:i:s" }}</small></p>
+                                    <p class="mt-0 mb-1 fs-16">{{ notice.content|safe }}</p>
+                                    <a href="javascript: void(0);" class="btn btn-sm btn-light">👍</a>
+                                </div>
+                            </div>
+                            </div>
+                            {% endfor %}
+
+                            <!-- 发布通知模态框 -->
+                            <div id="signup-modal" class="modal fade" tabindexs="-1" role="dialog" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title" id="multiple-oneModalLabel">新增</h4>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form id="addForm" action="#" novalidate
+                                                  class="ps-3 pe-3">
+
+                                                {% for field in form %}
+                                                    <div class="mb-3" style="position: relative">
+                                                        <label class="form-label">{{ field.label }}</label>
+                                                        {{ field }}
+                                                        <span class="s_error"
+                                                              style="color:red;position: absolute">{{ field.errors.0 }}</span>
+                                                    </div>
+                                                {% endfor %}
+                                                <div class="mb-3 text-center">
+                                                    <button type="button" class="btn rounded-pill btn-light"
+                                                            data-bs-dismiss="modal">关闭
+                                                    </button>
+
+                                                    <input type="button" class="btn rounded-pill btn-primary"
+                                                           id="btnSave" value="保存"/>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div><!-- /.modal-content -->
+                                </div><!-- /.modal-dialog -->
+                            </div><!-- /.modal -->
+
+                            </div>
+                            <!-- end timeline -->
+                        </div> <!-- end col -->
+                    </div>
+                    <!-- end row -->
+
+                </div> <!-- container -->
+
+            </div> <!-- content -->
+
+            <!-- Footer Start -->
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <script>document.write(new Date().getFullYear())</script>
+                            © HUAT - www.huat.edu.cn
+                        </div>
+                        <div class="col-md-6">
+                            <div class="text-md-end footer-links d-none d-md-block">
+                                <a href="javascript: void(0);">关于</a>
+                                <a href="javascript: void(0);">支持</a>
+                                <a href="javascript: void(0);">联系我们</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+            <!-- end Footer -->
+
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"></script>
+    <script type="text/javascript">
+        let EDIT_ID = null;
+        $(function () {
+            // 点击删除的方法
+            bindBtnDelete();
+            // 确认删除
+            bindBtmConfirmDelete();
+            // 由于【编辑】和【新增】是用的同一个模态框，所以得对他们进行判断
+            binBtnSave();
+            // 添加新员工 -- 模态框
+            bindBtnAddEvent();
+            binBtnEdit();
+        })
+
+
+        // 保存按钮函数：判断当前EDIT_ID的值，如果不为空则进行编辑函数，如果为空则进行添加函数
+        function binBtnSave() {
+            $('#btnSave').click(function () {
+                $(".s_error").empty();
+                if (EDIT_ID) {
+                    doEdit();
+                } else {
+                    doAdd();
+                }
+            })
+        }
+
+        // 具体实现新增的函数 doAdd
+        function doAdd() {
+            $.ajax({
+                url: '/teacher_add/notice/',
+                type: 'post',
+                data: $('#addForm').serialize(),
+                dataType: 'JSON',
+                success: function (res) {
+                    if (res.status) {
+                        alert('添加成功！')
+                        location.reload();
+                    } else {
+                        $.each(res.error, function (name, data) {
+                            $('#id_' + name).next().text(data[0])
+                        })
+                    }
+                }
+            })
+        }
+
+        // 添加新员工 -- 模态框
+        function bindBtnAddEvent() {
+            $('.btn-function').click(function () {
+                $(".s_error").empty();
+                // 首先将编辑的id置空 因为编辑和新增用的是用一个模态框
+                EDIT_ID = undefined;
+                // 新增之前先清除模态框表单内容
+                $('#addForm')[0].reset()
+            })
+        }
+
+        // 获取当前要编辑的班级的数据
+        function binBtnEdit() {
+            $('.btnEdit').click(function () {
+                // 编辑之前先清除之前模态框表单内容
+                $('#addForm')[0].reset();
+                EDIT_ID = $(this).data('eid');
+                // alert(EDIT_ID)
+                $.ajax({
+                    url: '/get/classes/edit_detail/',
+                    type: 'get',
+                    data: {
+                        eid: EDIT_ID
+                    },
+                    dataType: "JSON",
+                    success: function (res) {
+                        if (res.status) {
+                            $('#multiple-oneModalLabel').text('编辑')
+                            // 将原本的数据在编辑框上显示出来
+                            $.each(res.data, function (name, value) {
+                                $('#id_' + name).val(value)
+                                // 修改标题文字
+                            })
+                        } else {
+                            alert(res.error)
+                        }
+                    }
+                })
+            })
+        }
+
+        // 编辑 函数
+        function doEdit() {
+            $.ajax({
+                url: '/teacher/classes_edit/' + '?eid=' + EDIT_ID,
+                type: 'post',
+                data: $('#addForm').serialize(),
+                dataType: 'JSON',
+                success: function (res) {
+                    if (res.status) {
+                        alert('编辑成功！')
+                        location.reload();
+                    } else {
+                        if (res.tips) {
+                            alert(res.tips)
+                        } else {
+                            $.each(res.error, function (name, data) {
+                                $('#id_' + name).next().text(data[0])
+                            })
+                        }
+
+                    }
+                }
+            })
+        }
+
+        // 点击删除按钮的同时获取当前id
+        function bindBtnDelete() {
+            $('body').on('click', '.btnDelete', function () {
+                // 获取当前这一行的 id 并传递给 bindBtmConfirmDelete 函数使用
+                let deleteId = $(this).data('id');
+                bindBtmConfirmDelete(deleteId);
+            });
+        }
+
+        // 确认删除
+        function bindBtmConfirmDelete(id) {
+            $('#confirm_delete').click(function () {
+                // 将 id 发送到后端
+                $.ajax({
+                    url: '/teacher/classes/delete/',
+                    method: "GET",
+                    data: {
+                        did: id
+                    },
+                    dataType: "JSON",
+                    success: function (res) {
+                        if (res.status) {
+                            location.reload()
+                        } else {
+                            alert(res.error);
+                            location.reload()
+                        }
+                    }
+                })
+            });
+        }
+    </script>
+{% endblock %}

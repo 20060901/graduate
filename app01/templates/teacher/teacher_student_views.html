@@ -1,0 +1,296 @@
+{% extends 'teacher/teacher_layout.html' %}
+{% load static %}
+{% block content %}
+    <!-- 内容填充 -->
+    <div class="content-page">
+        <div class="content">
+
+            <!-- Start Content-->
+            <div class="container-fluid">
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="page-title-box justify-content-between d-flex align-items-md-center flex-md-row flex-column">
+                            <h4 class="page-title">班级学生信息</h4>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <button id="btnAdd" class="btn btn-success btn-function" data-bs-toggle="modal"
+                                        data-bs-target="#signup-modal">
+                                    新增学生
+                                </button>
+                                <br>
+                                <br>
+                                <table id="alternative-page-datatable"
+                                       class="table table-striped dt-responsive nowrap w-100 dataTable no-footer dtr-inline">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>学号</th>
+                                        <th>用户</th>
+                                        <th>密码</th>
+                                        <th>手机号</th>
+                                        <th>班级</th>
+                                        <th>毕业去向</th>
+                                        <th>意向城市</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for student in students %}
+                                        <tr>
+                                            <td>{{ student.id }}</td>
+                                            <td>{{ student.student_no }}</td>
+                                            <td><img src="/media/{{ student.avatar }}"
+                                                     alt="table-user"
+                                                     class="me-2 rounded-circle"
+                                                     height="24"> {{ student.username }}</td>
+                                            <td>******</td>
+                                            <td>{{ student.phone }}</td>
+                                            <td>{{ student.classs.name }}</td>
+                                            <td>{{ student.get_province_display }}</td>
+                                            <td>{{ student.get_status_display }}</td>
+                                            <td>
+                                                <button data-eid="{{ student.id }}"
+                                                        class="btn btn-primary btn-sm btn-function btnEdit"
+                                                        data-bs-toggle="modal" data-bs-target="#signup-modal">
+                                                    编辑
+                                                </button>
+                                                <button data-id="{{ student.id }}"
+                                                        class="btn btn-danger btn-sm btnDelete"
+                                                        data-bs-toggle="modal" data-bs-target="#fill-danger-modal">删除
+                                                </button>
+                                            </td>
+
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+
+                                <!-- 编辑、新增模态框 -->
+                                <div id="signup-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="multiple-oneModalLabel">新增</h4>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form id="addForm" action="#" novalidate
+                                                      class="ps-3 pe-3">
+
+                                                    {% for field in form %}
+                                                        <div class="mb-3" style="position: relative">
+                                                            <label class="form-label">{{ field.label }}</label>
+                                                            {{ field }}
+                                                            <span class="s_error"
+                                                                  style="color:red;position: absolute">{{ field.errors.0 }}</span>
+                                                        </div>
+                                                    {% endfor %}
+                                                    <div class="mb-3 text-center">
+                                                        <button type="button" class="btn rounded-pill btn-light"
+                                                                data-bs-dismiss="modal">关闭
+                                                        </button>
+
+                                                        <input type="button" class="btn rounded-pill btn-primary"
+                                                               id="btnSave" value="保存"/>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div><!-- /.modal-content -->
+                                    </div><!-- /.modal-dialog -->
+                                </div><!-- /.modal -->
+
+                                <!-- 删除模态框 -->
+                                <div id="fill-danger-modal" class="modal fade" tabindex="-1" role="dialog"
+                                     aria-labelledby="danger-header-modalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content modal-filled bg-danger">
+                                            <div class="modal-header modal-colored-header bg-danger">
+                                                <h4 class="modal-title" id="danger-header-modalLabel">警告</h4>
+                                                <button type="button" class="btn-close btn-close-white"
+                                                        data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <h5 class="mt-0">您确定要删除该学生信息吗？</h5>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                                                    关闭
+                                                </button>
+                                                <input id="confirm_delete" type="button" class="btn btn-outline-light"
+                                                       value="确认">
+                                            </div>
+                                        </div><!-- /.modal-content -->
+                                    </div><!-- /.modal-dialog -->
+                                </div>
+
+                            </div> <!-- end card body-->
+                        </div> <!-- end card -->
+                    </div><!-- end col-->
+                </div> <!-- end row-->
+            </div>
+            <!-- end row-->
+
+        </div>
+        <!-- container -->
+
+    </div>
+    <!-- content -->
+{% endblock %}
+<!-- END wrapper -->
+{% block js %}
+    <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"></script>
+    <script type="text/javascript">
+        let EDIT_ID = null;
+        $(function () {
+            // 点击删除的方法
+            bindBtnDelete();
+            // 确认删除
+            bindBtmConfirmDelete();
+            // 由于【编辑】和【新增】是用的同一个模态框，所以得对他们进行判断
+            binBtnSave();
+            // 添加新员工 -- 模态框
+            bindBtnAddEvent();
+            binBtnEdit();
+        })
+
+
+        // 保存按钮函数：判断当前EDIT_ID的值，如果不为空则进行编辑函数，如果为空则进行添加函数
+        function binBtnSave() {
+            $('#btnSave').click(function () {
+                $(".s_error").empty();
+                if (EDIT_ID) {
+                    doEdit();
+                } else {
+                    doAdd();
+                }
+            })
+        }
+
+        // 具体实现新增的函数 doAdd
+        function doAdd() {
+            $.ajax({
+                url: '/teacher/add/',
+                type: 'post',
+                data: $('#addForm').serialize(),
+                dataType: 'JSON',
+                success: function (res) {
+                    if (res.status) {
+                        alert('添加成功！')
+                        location.reload();
+                    } else {
+                        $.each(res.error, function (name, data) {
+                            $('#id_' + name).next().text(data[0])
+                        })
+                    }
+                }
+            })
+        }
+
+        // 添加新员工 -- 模态框
+        function bindBtnAddEvent() {
+            $('.btn-function').click(function () {
+                $(".s_error").empty();
+                // 首先将编辑的id置空 因为编辑和新增用的是用一个模态框
+                EDIT_ID = undefined;
+                // 新增之前先清除模态框表单内容
+                $('#addForm')[0].reset()
+            })
+        }
+
+        // 获取当前要编辑的学生的数据
+        function binBtnEdit() {
+            $('.btnEdit').click(function () {
+                // 编辑之前先清除之前模态框表单内容
+                $('#addForm')[0].reset();
+                EDIT_ID = $(this).data('eid');
+                // alert(EDIT_ID)
+                $.ajax({
+                    url: '/get/edit_detail/',
+                    type: 'get',
+                    data: {
+                        eid: EDIT_ID
+                    },
+                    dataType: "JSON",
+                    success: function (res) {
+                        if (res.status) {
+                            $('#multiple-oneModalLabel').text('编辑')
+                            // 将原本的数据在编辑框上显示出来
+                            $.each(res.data, function (name, value) {
+                                $('#id_' + name).val(value)
+                                // 修改标题文字
+                            })
+                        } else {
+                            alert(res.error)
+                        }
+                    }
+                })
+            })
+        }
+
+        // 编辑 函数
+        function doEdit() {
+            $.ajax({
+                url: '/teacher/student_edit/' + '?eid=' + EDIT_ID,
+                type: 'post',
+                data: $('#addForm').serialize(),
+                dataType: 'JSON',
+                success: function (res) {
+                    if (res.status) {
+                        alert('编辑成功！')
+                        location.reload();
+                    } else {
+                        if (res.tips) {
+                            alert(res.tips)
+                        } else {
+                            $.each(res.error, function (name, data) {
+                                $('#id_' + name).next().text(data[0])
+                            })
+                        }
+
+                    }
+                }
+            })
+        }
+
+        // 点击删除按钮的同时获取当前id
+        function bindBtnDelete() {
+            $('body').on('click', '.btnDelete', function () {
+                // 获取当前这一行的 id 并传递给 bindBtmConfirmDelete 函数使用
+                let deleteId = $(this).data('id');
+                bindBtmConfirmDelete(deleteId);
+            });
+        }
+
+        // 确认删除
+        function bindBtmConfirmDelete(id) {
+            $('#confirm_delete').click(function () {
+                // 将 id 发送到后端
+                $.ajax({
+                    url: '/teacher/delete/',
+                    method: "GET",
+                    data: {
+                        did: id
+                    },
+                    dataType: "JSON",
+                    success: function (res) {
+                        if (res.status) {
+                            location.reload()
+                        } else {
+                            alert(res.error);
+                            location.reload()
+                        }
+                    }
+                })
+            });
+        }
+    </script>
+{% endblock %}
