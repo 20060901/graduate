@@ -1,0 +1,393 @@
+{% extends 'student/student_layout.html' %}
+{% load static %}
+{% block content %}
+    <div class="content-page">
+        <div class="content">
+            <!-- Start Content-->
+            <div class="container-fluid">
+
+                <!-- start page title -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="page-title-box justify-content-between d-flex align-items-md-center flex-md-row flex-column">
+                            <ol class="breadcrumb m-0">
+
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <!-- end page title -->
+
+                {#                <div class="row">#}
+                {#                    <div class="col-12">#}
+                <link rel="stylesheet" href="{% static 'css/entypo.css' %}">
+                <link rel="stylesheet" href="{% static 'layui/css/layui.css' %}?v=2">
+                <link rel="stylesheet" href="{% static 'layui/css/admin.css' %}?v=1.4.0">
+                <link rel="stylesheet" href="{% static 'layuimini/css/public.css' %}?v=1">
+                <link rel="stylesheet" href="{% static 'layuimini/css/template.css' %}?v=1">
+                <script src="{% static 'js/jquery-1.11.0.min.js' %}"></script>
+                <script src="{% static 'layui/notify/notify_stand.js' %}"></script>
+                <script src="{% static 'js/main-gsap.js' %}"></script>
+                <script src="{% static 'js/jquery-ui-1.10.3.minimal.min.js' %}"></script>
+                <script src="{% static 'js/echarts.js' %}"></script>
+                <script src="{% static 'layui/layui.js' %}"></script>
+
+
+
+                            <div class="layui-fluid">
+                    <div class="lay-row layui-col-space10">
+                        <div class="layui-col-xs12 layui-col-md12">
+  <div class="layui-card">
+                                <div class="layui layui-card-header">
+                                    <div class="panel-title">哪个岗位的企业情况</div>
+                                </div>
+                                <div class="layui-card-body">
+                                    {% csrf_token %}
+                                    <button id="btntype" type="button" class="layui-btn" name="全部">全部</button>
+                                    {% for wk in wktype %}
+                                        <button id="btntype" type="button"
+                                                class="layui-btn layui-btn-primary"
+                                                name="{{ wk }}">{{ wk }}</button>
+                                    {% endfor %}
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="layui-col-xs12 layui-col-md6">
+                            <!-- 填充内容 -->
+                            <div class="layui-card">
+                                <div class="layui layui-card-header">
+                                    <div class="panel-title">行业数量</div>
+                                </div>
+                                <div class="layui-card-body">
+                                    <div id="main" style="height: 400px;position:relative;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-xs12 layui-col-md6">
+                            <!-- 填充内容 -->
+                            <div class="layui-card">
+                                <div class="layui layui-card-header">
+                                    <div class="panel-title">公司地址</div>
+                                </div>
+                                <div class="layui-card-body">
+                                    <div id="mainOne" style="height: 400px;position:relative;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-xs12 layui-col-md6">
+                            <!-- 填充内容 -->
+                            <div class="layui-card">
+                                <div class="layui layui-card-header">
+                                    <div class="panel-title">公司融资情况</div>
+                                </div>
+                                <div class="layui-card-body">
+                                    <div id="mainThree" style="height: 300px;position:relative;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-xs12 layui-col-md6">
+                            <!-- 填充内容 -->
+                            <div class="layui-card">
+                                <div class="layui layui-card-header">
+                                    <div class="panel-title">公司人数</div>
+                                </div>
+                                <div class="layui-card-body">
+                                    <div id="mainTwo" style="height: 300px;position:relative;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script>
+        $(document).ready(function () {
+
+            $.ajax({
+                url: "/api/get_gongsi_qk/",
+                type: "get",
+                async: true,
+                dataType: 'json',
+                success: function (res) {
+                    if (res.msg != 'ok') {
+                        layer.msg('请求错误')
+                    } else {
+                        {#  表一#}
+                        option1.yAxis.data = res.data.cnName
+                        option1.series[0].data = res.data.cnValue
+                        option1 && myChart1.setOption(option1)
+                        {#  表二#}
+                        optionChinaMap.legend.data = res.data.citydata;
+                        optionChinaMap.series[0].data = res.data.cadata;
+                        optionChinaMap && chinaMapChart.setOption(optionChinaMap)
+                        {#  表三#}
+                        option2.xAxis.data = res.data.cpname;
+                        option2.series[0].data = res.data.cpdata;
+                        option2 && myChart2.setOption(option2)
+                        {#表四#}
+                        option3.series[0].data = res.data.statusredu
+                        option3 && myChart3.setOption(option3)
+
+                        layer.msg('加载成功')
+
+                    }
+
+                },
+                error: function () {
+                    layer.msg('请求失败')
+                }
+            })
+            $(".layui-card-body button#btntype").each(function () {
+                var type = $(this).attr('name')
+                var csrf_token = $('[name="csrfmiddlewaretoken"]').val()
+                $(this).on("click", function () {
+                    $(this).removeClass("layui-btn-primary").siblings().addClass('layui-btn-primary')
+                    $.ajax({
+                        url: "/api/get_gongsi_qk/",
+                        type: "post",
+                        data: {
+                            "typetitle": type,
+                            "csrfmiddlewaretoken": csrf_token
+                        },
+                        async: true,
+                        dataType: 'json',
+                        success: function (res) {
+                            if (res.msg != 'ok') {
+                                layer.msg('请求错误')
+                            } else {
+
+
+                                {#    表一#}
+                                option1.yAxis.data = res.data.cnName
+                                option1.series[0].data = res.data.cnValue
+                                option1 && myChart1.setOption(option1)
+                                {#                                表二#}
+                                optionChinaMap.legend.data = res.data.citydata;
+                                optionChinaMap.series[0].data = res.data.cadata;
+                                optionChinaMap && chinaMapChart.setOption(optionChinaMap)
+                                {#                                表三#}
+                                option2.xAxis.data = res.data.cpname;
+                                option2.series[0].data = res.data.cpdata;
+                                option2 && myChart2.setOption(option2)
+                                {#表四#}
+                                option3.series[0].data = res.data.statusredu
+                                option3 && myChart3.setOption(option3)
+                                layer.msg('加载成功')
+
+                            }
+
+                        },
+                        error: function () {
+                            layer.msg('请求失败')
+                        }
+                    })
+                })
+            })
+        })
+    </script>
+    {# 行业数量 main #}
+    <script>
+
+        var myChart1 = echarts.init(document.getElementById('main'));
+        var option1;
+        // Generate data
+        // option
+        option1 = {
+            title: {
+                text: '行业数量柱状图',
+                textStyle: {
+                    color: '#235894'
+                }
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            legend: {},
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'value'
+            },
+            yAxis: {
+                type: 'category',
+                data: ['Msdasddon', 'Tsdasdaue', 'Wesdasdasdd', 'Thsadasdasdu', 'asdasdaFri', 'Sat', 'Sun']
+            },
+            series: [
+                {
+                    name: '行业个数',
+                    type: 'bar',
+                    stack: 'total',
+                    label: {
+                        show: true
+                    },
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: [20, 103, 21]
+                }
+            ]
+        };
+        option1 && myChart1.setOption(option1);
+        window.addEventListener("resize", function () {
+            myChart1.resize();
+        });
+    </script>
+    {# 公司地址 mainOne#}
+    <script>
+
+        var chinaMapChart = echarts.init(document.getElementById('mainOne'));
+        var optionChinaMap;
+
+        function randomData() {
+            return Math.round(Math.random() * 500);
+        }
+
+        optionChinaMap = {
+            title: {
+                text: '公司地址分布图',
+                textStyle: {
+                    color: '#235894'
+                }
+            },
+            tooltip: {
+                trigger: 'item'
+            },
+            legend: {
+                type: 'scroll',
+                orient: 'vertical',//图例的排列方向
+                textStyle: {color: '#000'},
+                left: 'left',//图例的位置
+                top: 20,
+                data: ''
+            },
+            series: [
+                {
+                    name: '全国数据',
+                    type: 'pie',
+                    radius: ['30%', '60%'],
+                    center: ['60%', '50%'],
+                    label: {
+                        show: false,
+                        position: 'center'
+                    },
+                    itemStyle: {
+                        emphasis: {//是图形在高亮状态下的样式,比如在鼠标悬浮或者图例联动高亮时
+                            label: {
+                                show: true,
+                                fontSize: '40',
+                                fontWeight: 'bold'
+                            },
+                        }
+                    },
+                    data: ''
+                }
+            ]
+        };
+        chinaMapChart.setOption(optionChinaMap, true);
+        window.addEventListener("resize", function () {
+            chinaMapChart.resize();
+        });
+    </script>
+    {# 公司人数 mainTwo#}
+    <script>
+
+        var myChart2 = echarts.init(document.getElementById('mainTwo'));
+        var option2;
+        option2 = {
+            color: ['#5ba585'],
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                {#人#}
+                data: '',
+            },
+            yAxis: {
+                name: '公司个数',
+                type: 'value',
+                axisLine: {
+                    show: true,
+                    lineStyle: {
+                        color: '#5ba585'
+                    }
+                },
+            },
+            series: [
+                {
+                    name: '公司个数',
+                    smooth: true,
+                    type: 'line',
+                    {#name人value个数#}
+                    data: '',
+                }
+            ]
+        };
+        option2 && myChart2.setOption(option2);
+        window.addEventListener("resize", function () {
+            myChart2.resize();
+        });
+    </script>
+    <script>
+
+        var myChart3 = echarts.init(document.getElementById('mainThree'));
+        var option3;
+        option3 = {
+            title: {
+                text: '企业融资情况',
+                left: 'center'
+            },
+            legend: {
+                orient: '',
+                left: 0
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: '{b}\n{c}({d}%)'
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    mark: {show: true},
+                    dataView: {show: true, readOnly: false},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            series: [
+                {
+                    name: 'Nightingale Chart',
+                    type: 'pie',
+                    radius: [10, 150],
+                    center: ['50%', '50%'],
+                    roseType: 'area',
+                    itemStyle: {
+                        borderRadius: 8
+                    },
+                    data: '',
+                    label: {
+                        formatter: '{b}\n占比：{d}%'
+                    }
+                }
+            ]
+        };
+        option3 && myChart3.setOption(option3);
+        window.addEventListener("resize", function () {
+            myChart3.resize();
+        });
+    </script>
+
+
+
+                {% endblock %}

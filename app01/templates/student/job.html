@@ -1,0 +1,208 @@
+{% extends 'student/student_layout.html' %}
+{% load static %}
+{% block content %}
+    <div class="content-page">
+    <div class="content">
+    <!-- Start Content-->
+    <div class="container-fluid">
+
+    <!-- start page title -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box justify-content-between d-flex align-items-md-center flex-md-row flex-column">
+                <ol class="breadcrumb m-0">
+
+                </ol>
+            </div>
+        </div>
+    </div>
+    <!-- end page title -->
+
+    {#                <div class="row">#}
+    {#                    <div class="col-12">#}
+    <link rel="stylesheet" href="{% static 'css/entypo.css' %}">
+    <link rel="stylesheet" href="{% static 'layui/css/layui.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'layui/css/admin.css' %}?v=1.4.0">
+    <link rel="stylesheet" href="{% static 'layuimini/css/public.css' %}?v=1">
+    <link rel="stylesheet" href="{% static 'layuimini/css/template.css' %}?v=1">
+    <script src="{% static 'js/jquery-1.11.0.min.js' %}"></script>
+    <script src="{% static 'layui/notify/notify_stand.js' %}"></script>
+
+    <script src="{% static 'js/main-gsap.js' %}"></script>
+    <script src="{% static 'js/jquery-ui-1.10.3.minimal.min.js' %}"></script>
+    <script src="{% static 'js/echarts.js' %}"></script>
+    <script src="{% static 'layui/layui.js' %}"></script>
+
+
+    <div class="layui-card-body layui-row">
+        <div class="layui-col-xs12 layui-col-md12">
+            <!-- 填充内容 -->
+            <div class="layui-card">
+                <div class="layui layui-card-header">
+                    <strong>数据表格</strong>
+                </div>
+                <div class="layui-card-body layui-text">
+                    <table class="layui-hide"
+                           id="jobTable"
+                           lay-filter="jobtable"></table>
+                    {% csrf_token %}
+                </div>
+                <script type="text/html" id="toolbarDemo">
+                    <div class="layui-btn layui-btn-sm" lay-event="getCheckData">
+                        获取选中行数据
+                    </div>
+                    <div class="layui-btn layui-btn-sm" lay-event="collectData">
+                        <i class="layui-icon layui-icon-rate"></i>
+                        收藏选中行数据
+                    </div>
+                </script>
+                <script type="text/html" id="job-title-a">
+
+                    {% verbatim %}
+                    <a href="{{= d.detailUrl }}" target="_blank">{{= d.title }}</a>
+                    {% endverbatim %}
+                </script>
+                <script type="text/html" id="job-company-a">
+                    {% verbatim %}
+                    <a href="{{= d.companyUrl }}" target="_blank">{{= d.companyTitle
+                        }}</a>
+                    {% endverbatim %}
+                </script>
+                <script type="text/html" id="barDemo">
+                    <div class="layui-clear-space">
+                        <a class="layui-btn layui-btn-sm">
+                            删除
+                        </a>
+                    </div>
+                </script>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block js %}
+    {# 用户创建时间饼状图#}
+    <script>
+        layui.config({
+            base: '/static/layui/notify/'
+        }).use(['notify'], function () {
+            var table = layui.table;
+            var dropdown = layui.dropdown
+            table.render({
+                elem: '#jobTable',
+                url: '/api/dataview/',
+                parseData: function (res) {
+                    return {
+                        "code": res.code,
+                        "msg": res.msg,
+                        "count": res.data.all_count,
+                        "data": res.data.job_list
+                    }
+                },
+                toolbar: '#toolbarDemo',
+                defaultToolbar: ['filter', 'exports', 'print', {
+                    title: '提示'
+                    , layEvent: 'LAYTABLE_TIPS'
+                    , icon: 'layui-icon-tips'
+                }],
+                height: 'full-35',
+                css: [
+                    '.layui-table-tool-temp{padding-right:145px;}'
+                ].join(''),
+                cellMinWidth: 80,
+                totolRow: true,
+                page: true,
+                limit: 20, // 默认每页显示的数据条数
+                limits: [20, 50, 100, 150],// 用户可以选择的每页数据条数
+                cols: [[
+                    {type: 'checkbox', fixed: 'left'}
+                    , {field: 'id', fixed: 'left', width: 80, title: 'ID', sort: true,}
+                    , {field: 'title', width: 118, title: '岗位名字', templet: '#job-title-a'}
+                    , {field: 'address', width: 90, title: '岗位地点',}
+                    , {field: 'salary', width: 80, title: '薪水',}
+                    , {
+                        field: 'salaryMonth', width: 80, title: '年薪', templet: function (d) {
+                            var a = d.salaryMonth.replace('·', '')
+                            return a;
+                        }
+                    }
+                    , {field: 'workTag', width: 120, title: '能力标签',}
+                    , {field: 'type', width: 90, title: '职位类型',}
+                    , {field: 'educational', width: 90, title: '学历要求',}
+                    , {
+                        field: 'workExperience',
+                        width: 100,
+                        title: '工作经验',
+                    }
+                    , {
+                        field: 'pratice', width: 90, title: '是否实习', templet: function (d) {
+                            if (d.pratice == true) {
+                                return '实习岗位'
+                            } else {
+                                return '普通岗位';
+                            }
+                        }
+                    }
+
+                    , {field: 'companyTags', minWidth: 260, title: '福利待遇',}
+                    , {
+                        field: 'companyAvatar', width: 80, title: 'logo', templet: function (d) {
+                            return `<img class="layui-nav-img" src="${d.companyAvatar}">`
+                        }
+                    }
+                    , {field: 'companyTitle', width: 176, title: '公司名', templet: '#job-company-a'}
+                    , {field: 'companyStatus', width: 120, title: '融资',}
+                    , {field: 'companyPeople', width: 120, title: '人数',}
+                    , {fixed: 'right', title: '操作', width: 134, minWidth: 125, toolbar: '#barDemo'}
+                ]]
+            })
+            table.on('toolbar(getCheckData)', function (obj) {
+                {#表格id#}
+                var id = obj.config.id;
+                {#表格选中的#}
+                var checkStatus = table.checkStatus(id);
+                var othis = lay(this);
+                var csrf_token = $('[name="csrfmiddlewaretoken"]').val()
+                switch (obj.event) {
+                    case 'getCheckData':
+                        var data = checkStatus.data;
+                        layer.alert(layui.util.escape(JSON.stringify(data)));
+                        break
+                    case 'collectData':
+                        var data = checkStatus.data;
+                        var ids = data.map(function (o) {
+                            $.ajax({
+                                url: '/api/add_history/'
+                                , type: 'post'
+                                , data: {
+                                    'jobId': o.id
+                                    , "csrfmiddlewaretoken": csrf_token
+                                }
+                                , traditional: true
+                                , dataType: 'json'
+                                , success: function (res) {
+                                    if (res.code != 0) {
+                                        notify.warning(res.msg)
+                                    } else {
+                                        notify.success(res.msg)
+                                    }
+                                }
+                                , error: function () {
+                                    notify.error('收藏失败')
+                                }
+                            })
+                            return {'jobId': o.id}
+                        })
+                        layer.alert(layui.util.escape(JSON.stringify(ids)));
+                        console.log(ids)
+                        break
+                }
+            })
+        })
+    </script>
+
+    </div>
+    </div>
+    </div>
+
+{% endblock %}

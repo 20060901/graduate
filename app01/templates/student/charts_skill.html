@@ -1,0 +1,342 @@
+{% extends 'student/student_layout.html' %}
+{% load static %}
+{% block content %}
+    <div class="content-page">
+        <div class="content">
+            <!-- Start Content-->
+            <div class="container-fluid">
+
+                <!-- start page title -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="page-title-box justify-content-between d-flex align-items-md-center flex-md-row flex-column">
+                            <ol class="breadcrumb m-0">
+
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <!-- end page title -->
+
+                {#                <div class="row">#}
+                {#                    <div class="col-12">#}
+                <link rel="stylesheet" href="{% static 'css/entypo.css' %}">
+                <link rel="stylesheet" href="{% static 'layui/css/layui.css' %}?v=2">
+                <link rel="stylesheet" href="{% static 'layui/css/admin.css' %}?v=1.4.0">
+                <link rel="stylesheet" href="{% static 'layuimini/css/public.css' %}?v=1">
+                <link rel="stylesheet" href="{% static 'layuimini/css/template.css' %}?v=1">
+                <script src="{% static 'js/jquery-1.11.0.min.js' %}"></script>
+                <script src="{% static 'layui/notify/notify_stand.js' %}"></script>
+                <script src="{% static 'js/main-gsap.js' %}"></script>
+                <script src="{% static 'js/jquery-ui-1.10.3.minimal.min.js' %}"></script>
+                <script src="{% static 'js/echarts.js' %}"></script>
+                <script src="{% static 'layui/layui.js' %}"></script>
+
+
+                            <div class="layui-fluid">
+                    <div class="lay-row layui-col-space10">
+                        <div class="layui-col-xs6 layui-col-md8">
+ <div class="layui-card">
+                                <div class="layui layui-card-header">
+                                    <div class="panel-title">哪类岗位</div>
+                                </div>
+                                <div class="layui-card-body  layuiadmin-card-list">
+                                    <form class="layui-form layui-row layui-col-space16">
+                                        {% csrf_token %}
+                                        <div class="layui-col-md8">
+                                            <select class="form-control" name="type">
+                                                <option value="">全部</option>
+                                                {% for e in wktype %}
+                                                    <option value="{{ e }}"
+                                                            {% if type == e %}
+                                                            selected
+                                                            {% endif %}
+                                                    >{{ e }}</option>
+                                                {% endfor %}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="layui-col-md2">
+                                            <button type="submit"
+                                                    lay-submit
+                                                    lay-filter="type-submit"
+                                                    class="layui-btn layui-btn-danger">提交
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-xs6 layui-col-md4">
+                            <div class="layui-card" id="type_count">
+                            </div>
+                        </div>
+                        <script type="text/html" id="t_c_model">
+                            {% verbatim %}
+                             <div class="layui layui-card-header">
+                                    <div class="panel-title">{{= d.typename }}招聘总数</div>
+                                </div>
+                                <div class="layui-card-body  layuiadmin-card-list">
+                                    <p class="layuiadmin-big-font">{{= d.count }}</p>
+                                </div>
+                             {% endverbatim %}
+                        </script>
+                        <div class="layui-col-xs12 layui-col-md12">
+                            <!-- 填充内容 -->
+                            <div class="layui-card">
+                                <div class="layui layui-card-header">
+                                    <div class="panel-title" id="shop-tech-bank">市场技术排行</div>
+                                </div>
+                                <div class="layui-card-body">
+                                    <div id="main" style="height: 450px;position: relative;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-xs12 layui-col-md12">
+                            <!-- 填充内容 -->
+                            <div class="layui-card">
+                                <div class="layui layui-card-header">
+                                    <div class="panel-title" id="xljy_heatmap">学历经验热力图</div>
+                                </div>
+                                <div class="layui-card-body">
+                                    <div id="mainOne" style="height: 450px;position: relative;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                {#                放这里#}
+
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+{% endblock %}
+{% block js %}
+
+    <script>
+    var laytpl=layui.laytpl
+    var scripthtml=document.getElementById('t_c_model').innerHTML
+    var view=document.getElementById('type_count')
+        function aa(res) {
+
+            wklabel = res.data.wkaxis
+            wkdata = res.data.wkdata
+            option4.xAxis.data = res.data.wkaxis
+            option4.series[0].data = res.data.wkdata
+            option4 && myChart4.setOption(option4)
+            laytpl(scripthtml).render(res.data.typenums,function (html){
+                view.innerHTML=html
+            })
+            $('#shop-tech-bank').html(res.data.typenums.typename+'市场技术排名')
+            $('#xljy_heatmap').html(res.data.typenums.typename+'学历经验热力图')
+
+            option5.xAxis.data = res.data.eduleg
+            option5.yAxis.data = res.data.expleg
+            option5.visualMap.max = res.data.max
+            option5.series[0].data = res.data.heatmap_data
+
+            option5 && myChart5.setOption(option5)
+        }
+
+        $(document).ready(function () {
+            $.ajax({
+                url: '/api/get_jineng_qk/',
+                type: 'get',
+                success: function (res) {
+                    if (res.msg == 'ok') {
+                        aa(res)
+                    }
+                },
+                error: function () {
+                    layer.msg('失败')
+                }
+            })
+            layui.use(function () {
+                var $ = layui.$;
+                var form = layui.form;
+                var layer = layui.layer;
+
+                form.on('submit(type-submit)', function (data) {
+                    $.ajax({
+                        url: '/api/get_jineng_qk/',
+                        type: "POST",
+                        data: data.field,
+                        dataType: 'json',
+                        success: function (res) {
+                            if (res.code == 0) {
+                                aa(res)
+                            }
+                        },
+                        error: function () {
+                            layer.msg('请求失败')
+                        }
+                    })
+                    return false
+                })
+            })
+        })
+    </script>
+    <script>
+
+        var myChart4 = echarts.init(document.getElementById('main'));
+        var option4;
+        let wkdata = [220, 182, 191, 234, 290, 330, 310, 123, 442, 321, 90, 149, 210, 122, 133, 334, 198, 123, 125, 220]
+            ,
+            wklabel = ['点', '击', '柱', '子', '或', '者', '两', '指', '在', '触', '屏', '上', '滑', '动', '能', '够', '自', '动', '缩', '放'];
+        let yMax = 600;
+        let dataShadow = []
+        for (let i = 0; i < wkdata.length; i++) {
+            dataShadow.push(yMax);
+        }
+        option4 = {
+            title: {
+                text: '各职位技术排行'
+                , subtext: '职位技术重视程度'
+            },
+            xAxis: {
+                data: wklabel,
+                axisLabel: {
+                    inside: true,
+                    color: '#fff'
+                },
+                axisTick: {
+                    show: false
+                },
+                axisLine: {
+                    show: false
+                },
+                z: 10
+            },
+            yAxis: {
+                axisLine: {
+                    show: false
+                },
+                axisTick: {
+                    show: false
+                },
+                axisLabel: {
+                    color: '#999'
+                }
+            },
+            dataZoom: [
+                {
+                    type: 'inside'
+                }
+            ],
+            series: [
+                {
+                    type: 'bar',
+                    showBackground: true,
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            {offset: 0, color: '#83bff6'},
+                            {offset: 0.5, color: '#188df0'},
+                            {offset: 1, color: '#188df0'}
+                        ])
+                    },
+                    label: {
+                        show: true, //开启显示
+                        position: 'top', //在上方显示
+                        color: '#188df0'
+                    },
+                    emphasis: {
+                        itemStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                {offset: 0, color: '#2378f7'},
+                                {offset: 0.7, color: '#2378f7'},
+                                {offset: 1, color: '#83bff6'}
+                            ])
+                        }
+                    },
+                    data: wkdata,
+                }
+            ]
+        };
+        // Enable data zoom when user click bar.
+        const zoomSize = 6;
+        myChart4.on('click', function (params) {
+            console.log(params.dataIndex, zoomSize)
+            console.log(params.dataIndex - zoomSize / 2)
+            console.log(wklabel[Math.max(params.dataIndex - zoomSize / 2, 0)]);
+            myChart4.dispatchAction({
+                type: 'dataZoom',
+                startValue: wklabel[Math.max(params.dataIndex - zoomSize / 2, 0)],
+                endValue:
+                    wklabel[Math.min(params.dataIndex + zoomSize / 2, wkdata.length - 1)]
+            });
+        });
+        option4 && myChart4.setOption(option4);
+        window.addEventListener("resize", function () {
+            myChart4.resize();
+        });
+    </script>
+    <script>
+        var chartDom = document.getElementById('mainOne');
+        var myChart5 = echarts.init(chartDom);
+        var option5;
+        option5 = {
+            tooltip: {
+                position: 'top'
+            },
+            grid: {
+                height: '50%',
+                top: '10%'
+            },
+            xAxis: {
+                type: 'category',
+                data: '',
+                splitArea: {
+                    show: true
+                }
+            },
+            yAxis: {
+                type: 'category',
+                data: '',
+                splitArea: {
+                    show: true
+                }
+            },
+            visualMap: {
+                min: 0,
+                max: 10,
+                calculable: true,
+                orient: 'horizontal',
+                left: 'center',
+                bottom: '15%'
+            },
+            series: [
+                {
+                    name: 'edu-exp',
+                    type: 'heatmap',
+                    data: '',
+                    label: {
+                        show: true
+                    },
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+        option5 && myChart5.setOption(option5)
+    </script>
+
+
+
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
