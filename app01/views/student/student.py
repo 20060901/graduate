@@ -4,13 +4,17 @@ from django.core.validators import RegexValidator
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.hashers import make_password
-
+from django.db.models import Q
+from app01.utils.pagination_kaoyan import Pagination
 from Graduate.settings import MEDIA_ROOT
-from app01.models import Student, Class, Notice, Teacher
+from app01.models import *
 from app01.utils.bootstrap import BootStrapModelForm
 from app01.views.tools.tools import getNewName
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib import messages
+from app01.utils import getChartsSala, getChartsComp, getChartsTags
+from app01.utils import getHomeData, wordcount
+
 
 
 class StudentEditModelForm(BootStrapModelForm):
@@ -148,9 +152,108 @@ def student_get_notice(request):
     return JsonResponse(context)
 
 # 求职信息
-# def student_job(request):
-#     stu_info = request.session.get('info')
-#     context = {
-#         "stu_info": stu_info,
-#     }
-#     return render(request, 'student/student_job.html', context)
+def xinzi(request):
+    stu_info = request.session.get('info')
+    eduleg = getChartsSala.eduSelect()
+    expleg = getChartsSala.expSelect()
+    context = {
+        "stu_info": stu_info,
+        'eduleg': eduleg,
+        'expleg': expleg,
+    }
+    return render(request, 'student/job_xinzi.html', context)
+
+def dataTable(request):
+    stu_info = request.session.get('info')
+    context = {
+        "stu_info": stu_info,
+    }
+    return render(request, "student/job.html",context)
+
+
+
+def dataView(request):
+    stu_info = request.session.get('info')
+    context = {
+        "stu_info": stu_info,
+    }
+    return render(request, 'student/data_view.html', context)
+
+
+def chartsSkill(request):
+    stu_info = request.session.get('info')
+    wktype = getChartsComp.getTypeSet()
+    context = {
+        "stu_info": stu_info,
+        'type': type,
+        'wktype': wktype,
+    }
+    return render(request, 'student/charts_skill.html', context)
+
+
+def chartsTags(request):
+    stu_info = request.session.get('info')
+    # 公司福利
+    tagtext=getChartsTags.getAllTags()
+    # 公司性质
+    naturetext=getChartsTags.getAllNature()
+    # 福利词云
+    tagimg= wordcount.getImageByTags(tagtext)
+    # 性质词云
+    natureimg= wordcount.getImageByNature(naturetext)
+    return render(request, 'student/charts_tags.html', {
+         "stu_info": stu_info,
+        'wordcount':{
+            'tagimg':tagimg,
+            'natureimg':natureimg
+        }
+    })
+
+
+def chartsAddr(request):
+    stu_info = request.session.get('info')
+    if request.method=='POST':
+        address=request.POST['address']
+
+    else:
+        address='北京'
+    #选择框
+    return render(request, 'student/charts-address.html', {
+        "stu_info": stu_info,
+    })
+
+
+def chartsCompany(request):
+    stu_info = request.session.get('info')
+    jobsLen, usersLen, educationsTop, salaryTop, addressTop, salaryMonthTop, praticeMax = getHomeData.getAllTags()
+    print(jobsLen, usersLen, educationsTop, salaryTop, addressTop, salaryMonthTop, praticeMax)
+    wktype=getChartsComp.getTypeSet()
+    return render(request, 'student/charts-company.html', {
+         "stu_info": stu_info,
+        'wktype':wktype
+    })
+
+
+def kaoyan(request):
+    search_data = request.GET.get('q', "")
+    queryset = School.objects.all()
+    if search_data:
+        queryset = School.objects.filter(
+            Q(name__icontains=search_data) | Q(location__icontains=search_data)
+        )
+    location = request.GET.get('location', '')
+    if location:
+        queryset = School.objects.filter(location=location)
+    stu_info = request.session.get('info')
+    loctions = [i.get('location') for i in School.objects.all().values('location').distinct()]
+    page_object = Pagination(request, queryset)
+    context = {
+        "stu_info": stu_info,
+        "locations":loctions,
+        "link": "https://yz.chsi.com.cn",
+        "a0": "active",
+        "search_data": search_data,
+        "queryset": page_object.page_queryset,  # 分完页的数据
+        "page_string": page_object.html()  # 页码
+    }
+    return render(request, 'student/kaoyan.html', context)

@@ -20313,3 +20313,51 @@ span.flatpickr-weekday,
 [dir=rtl] .irs-bar--single {
   border-radius: 0 4px 4px 0 !important;
 }
+ul.tag-list,
+ul.company-tag-list{
+    padding-right: 10px;
+}
+li{
+    list-style: none;
+}
+.job-card-body,.job-card-footer{
+    display: flex;
+    justify-content: space-between;
+}
+/*岗位名字*/
+a.job-card-left,
+div.job-card-right{
+    width: 50%;
+}
+.job-title{
+    display: flex;
+    align-items: center;
+}
+/*薪资 学历 经历 hr*/
+.job-info{
+    display: flex;
+
+}
+ul.tag-list{
+
+}
+ul.tag-list li{
+    float: left;
+    margin-right: 10px;
+}
+.job-hr{
+
+}
+/*公司*/
+.job-card-right,
+.company-tag-list{
+    display: flex;
+
+}
+
+
+/*技术*/
+
+
+
+/*福利*/

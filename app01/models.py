@@ -117,3 +117,79 @@ class Notice(models.Model):
     class Meta:
         verbose_name = "通知"
         verbose_name_plural = "通知"
+
+
+
+class JobInfo(models.Model):
+    # model自增字段
+    id = models.AutoField('id', primary_key=True)
+    title = models.CharField('岗位名字', max_length=255, default='')
+    address = models.CharField('省份', max_length=255, default='')
+    type = models.CharField('职业', max_length=255, default='')
+    educational = models.CharField('学历', max_length=255, default='')
+    workExperience = models.CharField('工作经历', max_length=255, default='')
+    workTag = models.CharField('工作标签', max_length=2555, default='')
+    salary = models.CharField('薪资', max_length=255, default='')
+    salaryMonth = models.CharField('年终奖', max_length=255, default='')
+    companyTags = models.CharField('公司福利', max_length=2555, default='')
+    hrWork = models.CharField('人事职位', max_length=255, default='')
+    hrName = models.CharField('人事名字', max_length=255, default='')
+    pratice = models.BooleanField('是否为实习单位', max_length=255, default='')
+    companyTitle = models.CharField('公司名称', max_length=255, default='')
+    companyAvatar = models.CharField('公司头像', max_length=255, default='')
+    companyNature = models.CharField('公司性质', max_length=255, default='')
+    companyStatus = models.CharField('公司状态', max_length=255, default='')
+    companyPeople = models.CharField('公司人数', max_length=255, default='')
+    detailUrl = models.CharField('详情地址', max_length=2555, default='')
+    companyUrl = models.CharField('公司详情地址', max_length=2555, default='')
+    createTime = models.DateField('创建时间', auto_now_add=True)
+    dist = models.CharField('行政区', max_length=255, default='')
+
+    def toDict(self):
+        return {'title': self.title, 'address': self.address, 'type': self.type, 'educational': self.educational,
+                'workExperience': self.workExperience, 'workTag': self.workTag, 'salary': self.salary,
+                'salaryMonth': self.salaryMonth, 'companyTags': self.companyTags,'hrName': self.hrName.strip(self.hrWork),
+                'hrWork': self.hrWork, 'pratice': self.pratice,'companyTitle': self.companyTitle,
+                'companyAvatar': self.companyAvatar,'companyNature': self.companyNature, 'companyStatus': self.companyStatus,
+                'companyPeople': self.companyPeople,'detailUrl':self.detailUrl,'companyUrl':self.companyUrl,
+                'dist':self.dist}
+
+    # 数据库的表名称
+    class Meta:
+        verbose_name = "招聘信息"
+        verbose_name_plural = "招聘信息"
+
+
+class School(models.Model):
+    name = models.CharField(verbose_name="院校名称", max_length=32, null=True)
+    location = models.CharField(verbose_name="所在地", max_length=32, null=True)
+    department = models.CharField(verbose_name="院校隶属", max_length=32, null=True)
+    department_choices = (
+
+        (1, "研究生院"),
+        (0, " ")
+    )
+    is_research = models.BooleanField(verbose_name="是否有研究生院", choices=department_choices, max_length=32,
+                                      null=True)
+    line_choices = (
+
+        (1, "自划线"),
+        (0, " ")
+    )
+    is_auto_line = models.BooleanField(verbose_name="是否为自划线院校", choices=line_choices, max_length=32, null=True)
+    double_choices = (
+        (1, "双一流"),
+        (0, " ")
+    )
+    is_double_one = models.BooleanField(verbose_name="是否为双一流院校", choices=double_choices, max_length=32,
+                                        null=True)
+    icon = models.CharField(verbose_name="图标链接", max_length=255, default='')
+    url = models.CharField(verbose_name="院校链接", max_length=255, default='')
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "院校"
+        verbose_name_plural = verbose_name
+

@@ -1,8 +1,7 @@
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path, include
 from django.views.static import serve
-
+from django.urls import path, include, re_path
 from Graduate import settings
 from Graduate.settings import MEDIA_ROOT
 from app01.views.everyone import login, register
@@ -13,6 +12,7 @@ from app01.views.tools import *
 
 urlpatterns = [
                   path('', login.login),
+                  re_path(r'^api/', include('app01.api-urls')),
                   path("admin/", admin.site.urls),
                   path('register/', register.register),
                   path('error/', tools.error),
@@ -26,8 +26,15 @@ urlpatterns = [
                   path('student/get/china/data/', student_echarts.student_get_china_data),
                   path('student/notice/', student.student_notice),
                   path('student/get/notice/', student.student_get_notice),
-                  #求职信息路由
-                  # path('student/job/',student.student_job),
+                  path('student/xinzi/', student.xinzi),
+                  path('student/dataTable/', student.dataTable),
+                  path("student/dataView/", student.dataView),
+                  path('student/chartsSkill/', student.chartsSkill),
+                  path('student/chartsTags/', student.chartsTags),
+                  path('student/chartsAddr/', student.chartsAddr),
+                  path('student/chartsCompany/', student.chartsCompany),
+                  path('student/kaoyan/', student.kaoyan),
+
                   # 学生清除红点
                   path('student/clear_notice/', student.student_clear_notice),
                   # 教师登陆

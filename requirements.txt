@@ -1,5 +1,0 @@
-Django
-django_recaptcha
-numpy
-Pillow
-django-simpleui
