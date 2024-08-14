@@ -11,8 +11,13 @@ class Teacher(models.Model):
     username = models.CharField(verbose_name='用户名', max_length=50, unique=True)
     phone = models.CharField(max_length=50, verbose_name='手机号', unique=True)
     password = models.CharField(verbose_name='密码', max_length=100)
+    email = models.EmailField(null=True, blank=True, unique=True)
     avatar = models.ImageField(upload_to='teacher_images', null=True, blank=True, verbose_name='头像')
     role = models.IntegerField(verbose_name='角色', choices=role, default=0)
+    last_login = models.DateTimeField(null=True, blank=True)
+
+    def get_email_field_name(self):
+        return 'email'
 
     def __str__(self):
         return self.username
@@ -83,6 +88,7 @@ class Student(models.Model):
     username = models.CharField(max_length=50, verbose_name='用户名')
     phone = models.CharField(max_length=50, verbose_name='手机号', unique=True)
     password = models.CharField(max_length=100, verbose_name='密码')
+    email = models.EmailField(null=True, blank=True, unique=True)
     classs = models.ForeignKey(Class, on_delete=models.CASCADE, related_name='students', verbose_name='所在班级')
     avatar = models.ImageField(upload_to='app01/', default='app1/default_avatar.jpg', null=True, blank=True,
                                verbose_name='头像')
@@ -90,6 +96,10 @@ class Student(models.Model):
     role = models.IntegerField(verbose_name='角色', choices=role, default=1)
     province = models.IntegerField(verbose_name='意向地区', choices=provinces, default=16)
     is_read = models.IntegerField(verbose_name="已未读", choices=((0, '未读'), (1, '已读')), default=0)
+    last_login = models.DateTimeField(null=True, blank=True)
+
+    def get_email_field_name(self):
+        return 'email'
 
     def __str__(self):
         return self.student_no

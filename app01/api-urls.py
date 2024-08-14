@@ -10,4 +10,8 @@ urlpatterns = [
     path('get_jineng_qk/',charts.jineng_qk),
     path('get_chengshi_qk/',charts.chengshi_qk),
 
+    path('delete_job/', table.delete_job, name='delete_job'),
+    path('edit_job/', table.edit_job, name='edit_job'),
+
+
 ]

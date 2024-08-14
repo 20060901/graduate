@@ -21,6 +21,8 @@ urlpatterns = [
                   # 学生登录页面
                   path('student/index/', student.stu_index),
                   path('student/edit/password/', student.student_edit_password),
+                  path("student/forgetpasswd/", student.student_forgetpasswd),
+                  path('reset-student-password/<str:uidb64>/<str:token>/', student.reset_password,name='reset-student-password'),
                   path('logout/', tools.logout),
                   path('student/china/', student_echarts.student_china),
                   path('student/get/china/data/', student_echarts.student_get_china_data),
@@ -39,6 +41,8 @@ urlpatterns = [
                   path('student/clear_notice/', student.student_clear_notice),
                   # 教师登陆
                   path('teacher/login/', teacher.teacher_login),
+                  path("teacher/forgetpasswd/", teacher.teacher_forgetpasswd),
+                  path('reset-teacher-password/<str:uidb64>/<str:token>/', teacher.reset_password, name='reset-teacher-password'),
                   path('teacher_index/', teacher.teacher_index),
                   # 教师查看学生信息
                   path('teacher_student_views/', teacher.teacher_student_views),

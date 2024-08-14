@@ -1,5 +1,4 @@
 import os
-
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password
@@ -15,6 +14,14 @@ from app01.models import Student, Class, Teacher
 from app01.utils.bootstrap import BootStrapModelForm, BootStrapForm
 from app01.views.tools.tools import getNewName, class_cache_callback
 
+from django.contrib.auth import update_session_auth_hash
+from django.core.mail import send_mail
+from django.conf import settings
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
 
 class TeacherLoginForm(BootStrapForm):
     username = forms.CharField(label='用户名', widget=forms.TextInput,
@@ -24,6 +31,136 @@ class TeacherLoginForm(BootStrapForm):
                             widget=forms.TextInput, required=True)
     password = forms.CharField(label='密码',
                                widget=forms.PasswordInput, required=True)
+
+
+def teacher_forgetpasswd(request):
+    if request.method == 'GET':
+        return render(request, 'teacher/teacher_forgetpasswed.html')
+    email = request.POST.get('email')
+    if Teacher.objects.filter(email=email).exists():
+        # 发送重置密码链接
+        user = Teacher.objects.get(email=email)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        link = request.build_absolute_uri(reverse('reset-teacher-password', kwargs={'uidb64': uid, 'token': token}))
+        message = f"""
+                            <html>
+                                <head>
+                                    <style>
+                                        body {{
+                                            font-family: Arial, sans-serif;
+                                            background-color: #f2f2f2;
+                                        }}
+
+                                        .container {{
+                                            position: relative;
+                                            max-width: 600px;
+                                            margin: 0 auto;
+                                            padding: 20px;
+                                            background-color: #fff;
+                                            border-radius: 5px;
+                                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                                        }}
+
+                                        h1 {{
+                                            color: #333;
+                                            font-size: 24px;
+                                            margin-bottom: 20px;
+                                        }}
+
+                                        p {{
+                                            color: #555;
+                                            font-size: 16px;
+                                            line-height: 1.5;
+                                        }}
+
+                                        a {{
+                                            color: #007bff;
+                                            text-decoration: none;
+                                        }}
+
+                                        a:hover {{
+                                            text-decoration: underline;
+                                        }}
+
+                                        p.signature {{
+                                            position: absolute;
+                                            bottom: 10px;
+                                            right: 30px;
+                                            color: #555;
+                                            font-size: 16px;
+                                            line-height: 1.5;
+                                        }}
+                                    </style>
+                                </head>
+                                <body>
+                                    <div class="container">
+                                        <h1>请重置您的密码！</h1>
+                                        <p>点击链接开始重置：</p>
+                                        <p><a href="{link}">点击重置</a></p>
+                                        <p>如果链接不可用，请复制以下内容到浏览器重置密码：</p>
+                                        <p>{link}</p>
+                                        <br>
+                                        <br>
+                                        <p class="signature">原宝</p>
+                                    </div>
+                                </body>
+                            </html>
+                            """
+
+        send_mail(
+            '教师端密码找回',
+            message='',
+            html_message=message,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[email, ],
+        )
+        messages.error(request, '邮件已发送!!!')
+        return redirect('/teacher/forgetpasswd/')
+    else:
+        messages.error(request, '该邮箱不存在!!!')
+        return redirect('/teacher/forgetpasswd/')
+
+
+
+def reset_password(request, uidb64, token):
+    try:
+        uid = force_bytes(urlsafe_base64_decode(uidb64))
+        user = Teacher.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, Teacher.DoesNotExist):
+        user = None
+    context_data = {}
+    if user is not None and default_token_generator.check_token(user, token):
+        if request.method == 'POST':
+            password1 = request.POST.get('new_password1')
+            password2 = request.POST.get('new_password2')
+            if password1 == password2:
+                user.set_password(password1)
+                user.save()
+                update_session_auth_hash(request, user)
+                messages.error(request, '重置成功')
+                return redirect('/')
+            else:
+                messages.error(request, '两次密码不一致')
+                return render(request, 'teacher/teacher_reset_password.html', context=context_data)
+        else:
+            context_data.update({
+                'uidb64': uidb64,
+                'token': token,
+                'email': user.email
+            })
+            return render(request, 'teacher/teacher_reset_password.html', context=context_data)
+    else:
+        messages.error(request, '链接失效')
+        return render(request, 'teacher/teacher_reset_password.html', context=context_data)
+
+
+
+
+
+
+
+
 
 
 def teacher_login(request):
@@ -98,10 +235,18 @@ def teacher_index(request):
                 return redirect('/teacher_index/')
         teacher.username = request.POST.get('username')
         teacher.phone = request.POST.get('phone')
+        email=request.POST.get('email')
+        if email != teacher.email:
+            if Teacher.objects.filter(email=email).exists() or Student.objects.filter(email=email).exists():
+                messages.warning(request, '该邮箱已被注册！')
+                return redirect('/teacher_index/')
+        teacher.email = request.POST.get('email')
         save_image(request, teacher)
         teacher.save()
+        messages.success(request, '修改成功！')
         teacher_info['username'] = teacher.username
         teacher_info['phone'] = teacher.phone
+        teacher_info['email'] = teacher.email
         teacher_info['avatar'] = teacher.avatar.url
         request.session['info'] = teacher_info
         return redirect('/teacher_index/')

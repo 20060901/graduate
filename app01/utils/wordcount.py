@@ -12,11 +12,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FONT_PATH = os.path.join(BASE_DIR,'utils', 'STHUPO.TTF')
 
 def getImageByTags(text):
-    print(FONT_PATH)
     # 分词
     text_jieba = "".join(jieba.cut(text))
     # 蒙版
-    img = Image.open(os.path.join(settings.BASE_DIR, 'F:\\graduates-master\\app01\\static\\img\\tags.png'))
+    img = Image.open(os.path.join(settings.BASE_DIR, 'F:\\graduates-master\\app01\\static\\img\\china.png'))
     img_arr = np.array(img)
     wordcount = WordCloud(
         background_color='white',
@@ -64,11 +63,11 @@ def getImagesByAddTags(address, text):
     text_jieba = "".join(jieba.cut(text))
     if not os.path.exists(os.path.join(settings.BASE_DIR, 'F:\\graduates-master\\app01\\static\\img\\' + address + 'cloud.png')):
         # 蒙版
-        img = Image.open(os.path.join(settings.BASE_DIR, 'F:\\graduates-master\\app01\\static\\img\\china.png'))
-        img_arr = np.array(img)
+        # img = Image.open(os.path.join(settings.BASE_DIR, 'F:\\graduates-master\\app01\\static\\img\\true.jpg'))
+        # img_arr = np.array(img)
         wordcount = WordCloud(
             background_color='white',
-            mask=img_arr,
+            # mask=img_arr,
             font_path=FONT_PATH
         ).generate_from_text(text_jieba)
 

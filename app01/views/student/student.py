@@ -1,7 +1,7 @@
 import os
 from django import forms
 from django.core.validators import RegexValidator
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.hashers import make_password
 from django.db.models import Q
@@ -14,6 +14,137 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.contrib import messages
 from app01.utils import getChartsSala, getChartsComp, getChartsTags
 from app01.utils import getHomeData, wordcount
+
+
+from django.contrib.auth import update_session_auth_hash
+from django.core.mail import send_mail
+from django.conf import settings
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
+
+
+def student_forgetpasswd(request):
+    if request.method == 'GET':
+        return render(request, 'student/student_forgetpasswd.html')
+    email = request.POST.get('email')
+    if Student.objects.filter(email=email).exists():
+        # 发送重置密码链接
+        user = Student.objects.get(email=email)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        link = request.build_absolute_uri(reverse('reset-student-password', kwargs={'uidb64': uid, 'token': token}))
+        message = f"""
+                                <html>
+                                    <head>
+                                        <style>
+                                            body {{
+                                                font-family: Arial, sans-serif;
+                                                background-color: #f2f2f2;
+                                            }}
+
+                                            .container {{
+                                                position: relative;
+                                                max-width: 600px;
+                                                margin: 0 auto;
+                                                padding: 20px;
+                                                background-color: #fff;
+                                                border-radius: 5px;
+                                                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                                            }}
+
+                                            h1 {{
+                                                color: #333;
+                                                font-size: 24px;
+                                                margin-bottom: 20px;
+                                            }}
+
+                                            p {{
+                                                color: #555;
+                                                font-size: 16px;
+                                                line-height: 1.5;
+                                            }}
+
+                                            a {{
+                                                color: #007bff;
+                                                text-decoration: none;
+                                            }}
+
+                                            a:hover {{
+                                                text-decoration: underline;
+                                            }}
+
+                                            p.signature {{
+                                                position: absolute;
+                                                bottom: 10px;
+                                                right: 30px;
+                                                color: #555;
+                                                font-size: 16px;
+                                                line-height: 1.5;
+                                            }}
+                                        </style>
+                                    </head>
+                                    <body>
+                                        <div class="container">
+                                            <h1>请重置您的密码！</h1>
+                                            <p>点击链接开始重置：</p>
+                                            <p><a href="{link}">点击重置</a></p>
+                                            <p>如果链接不可用，请复制以下内容到浏览器重置密码：</p>
+                                            <p>{link}</p>
+                                            <br>
+                                            <br>
+                                            <p class="signature">原宝</p>
+                                        </div>
+                                    </body>
+                                </html>
+                                """
+
+        send_mail(
+            '学生端密码找回',
+            message='',
+            html_message=message,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[email, ],
+        )
+        messages.error(request, '邮件已发送!!!')
+        return redirect('/student/forgetpasswd/')
+    else:
+        messages.error(request, '该邮箱不存在!!!')
+        return redirect('/student/forgetpasswd/')
+
+def reset_password(request, uidb64, token):
+    try:
+        uid = force_bytes(urlsafe_base64_decode(uidb64))
+        user = Student.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, Teacher.DoesNotExist):
+        user = None
+    context_data = {}
+    if user is not None and default_token_generator.check_token(user, token):
+        if request.method == 'POST':
+            password1 = request.POST.get('new_password1')
+            password2 = request.POST.get('new_password2')
+            if password1 == password2:
+                user.set_password(password1)
+                user.save()
+                update_session_auth_hash(request, user)
+                messages.error(request, '重置成功')
+                return redirect('/')
+            else:
+                messages.error(request, '两次密码不一致')
+                return render(request, 'student/student_reset_password.html', context=context_data)
+        else:
+            context_data.update({
+                'uidb64': uidb64,
+                'token': token,
+                'email': user.email
+            })
+            return render(request, 'student/student_reset_password.html', context=context_data)
+    else:
+        messages.error(request, '链接失效')
+        return render(request, 'student/student_reset_password.html', context=context_data)
+
 
 
 
@@ -77,6 +208,13 @@ def stu_index(request):
         student.phone = request.POST.get('phone')
         student.status = request.POST.get('status')
         student.province = request.POST.get('province')
+        email=request.POST.get('email')
+        print(email)
+        if email != student.email:
+            if Teacher.objects.filter(email=email).exists() or Student.objects.filter(email=email).exists():
+                messages.warning(request, '该邮箱已被注册！')
+                return redirect('/student/index/')
+        student.email = request.POST.get('email')
         if 'pic' in request.FILES:
             pic = request.FILES['pic']
             new_name = getNewName('avatar')
@@ -91,12 +229,14 @@ def stu_index(request):
             # 如果没有上传图片,则使用默认值或保留原有值
             student.avatar = student.avatar
         student.save()
+        messages.success(request, '修改成功！')
         stu_info['username'] = student.username
         # 将加密后的密码保存到session
         stu_info['phone'] = student.phone
         stu_info['avatar'] = student.avatar.url
         stu_info['status'] = student.status
         stu_info['province'] = student.province
+        stu_info['email'] = student.email
         request.session['info'] = stu_info
         return redirect('/student/index/')
     return render(request, 'student/student_index.html', context)
@@ -163,8 +303,26 @@ def xinzi(request):
     }
     return render(request, 'student/job_xinzi.html', context)
 
+from spider.spiderMain import spider
+
 def dataTable(request):
     stu_info = request.session.get('info')
+    if request.method == 'POST':
+        job=request.POST.get('occupation')
+        job=str(job)
+        startPage=request.POST.get('startPage')
+        startPage=int(startPage)
+        endPage=request.POST.get('endPage')
+        endPage=int(endPage)
+        spiderObj = spider(job, startPage)
+        spiderObj.init()
+        spiderObj.main(endPage)
+        spiderObj.save_to_sql()
+        context = {
+            "stu_info": stu_info,
+        }
+        return render(request, "student/job.html", context)
+
     context = {
         "stu_info": stu_info,
     }
@@ -188,6 +346,7 @@ def chartsSkill(request):
         'type': type,
         'wktype': wktype,
     }
+    print(stu_info)
     return render(request, 'student/charts_skill.html', context)
 
 

@@ -8,6 +8,9 @@ import pandas as pd
 os.environ.setdefault('DJANGO_SETTINGS_MODULE','Graduate.settings')
 django.setup()
 from app01.models import JobInfo
+from selenium import webdriver
+
+
 
 
 class spider(object):
@@ -36,7 +39,7 @@ class spider(object):
         # 输入网址
         brower.get(self.spiderUrl % (self.type,self.page)) # get网址
         # 等待20秒
-        time.sleep(25)
+        time.sleep(10)
         # 获取网站招聘列表
         job_list = brower.find_elements(by=By.XPATH,value='//ul[@class="job-list-box"]/li') # find 30个li
         # 招聘列表转索引序列
@@ -46,6 +49,7 @@ class spider(object):
                 jobData = []
                 # 提示
                 print("正在爬取第%d条数据" % (index + 1))
+                # self.status_message = "正在爬取第%d条数据" % (index + 1)
                 #岗位名字   contains(@class,"job-title") class包含job-title
                 title = job.find_element(by=By.XPATH,value='.//a[@class="job-card-left"]/div[contains(@class,"job-title")]/span[@class="job-name"]').text
                 # 地址处理
@@ -204,6 +208,9 @@ class spider(object):
         self.page += 1
         # 执行爬取下一页
         self.main(page)
+
+    def get_status_message(self):
+        return self.status_message
 
     # 数据清洗
     def clean_csv(self):

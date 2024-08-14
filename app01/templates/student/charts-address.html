@@ -33,7 +33,7 @@
                 <script src="{% static 'layui/layui.js' %}"></script>
 
 
- <div class="layui-fluid">
+                <div class="layui-fluid">
                     <div class="lay-row layui-col-space10">
                         <div class="layui-col-xs6 layui-col-md12">
                             <!-- 填充内容 -->
@@ -43,26 +43,39 @@
 
                                 </div>
                                 <div class="layui-card-body" id="view">
-                                    <form class="layui-form layui-row layui-col-space16">
-                                        <input type="hidden"
-                                                                                                name="csrfmiddlewaretoken"
-                                                                                                value="dTPo11Ma7KOQuHUmtQtGV4ASK5SPRYTy7R5wMOY7M9q738CGILcc2X1Y7rMkJFVw">
-                                        <div class="layui-col-md8"><select class="form-control" name="address">
-                                            <option value="北京" selected="">北京</option>
-                                            <option value="上海">上海</option>
-                                            <option value="深圳">深圳</option>
-                                            <option value="杭州">杭州</option>
-                                            <option value="广州">广州</option>
-                                            <option value="南京">南京</option>
-                                            <option value="西安">西安</option>
-                                            <option value="成都">成都</option>
-                                        </select></div>
-                                        <div class="layui-col-md2">
-                                            <button type="submit" lay-submit="" lay-filter="city-submit"
-                                                    class="layui-btn layui-btn-danger">提交
-                                            </button>
-                                        </div>
-                                    </form>
+{#                                    <form class="layui-form layui-row layui-col-space16">#}
+{#                                        <input type="hidden"#}
+{#                                               name="csrfmiddlewaretoken"#}
+{#                                               value="dTPo11Ma7KOQuHUmtQtGV4ASK5SPRYTy7R5wMOY7M9q738CGILcc2X1Y7rMkJFVw">#}
+{#                                        <div class="layui-col-md8"><select class="form-control" name="address">#}
+{#                                            <option value="北京" selected="">北京</option>#}
+{#                                            <option value="上海">上海</option>#}
+{#                                            <option value="深圳">深圳</option>#}
+{#                                            <option value="杭州">杭州</option>#}
+{#                                            <option value="广州">广州</option>#}
+{#                                            <option value="南京">南京</option>#}
+{#                                            <option value="西安">西安</option>#}
+{#                                            <option value="成都">成都</option>#}
+{#                                        </select></div>#}
+{#                                        <div class="layui-col-md2">#}
+{#                                            <button type="submit" lay-submit="" lay-filter="city-submit"#}
+{#                                                    class="layui-btn layui-btn-danger">提交#}
+{#                                            </button>#}
+{#                                        </div>#}
+{#                                    </form>#}
+<form class="layui-form layui-row layui-col-space16">
+    <input type="hidden"
+           name="csrfmiddlewaretoken"
+           value="dTPo11Ma7KOQuHUmtQtGV4ASK5SPRYTy7R5wMOY7M9q738CGILcc2X1Y7rMkJFVw">
+    <div class="layui-col-md8">
+        <input type="text" class="form-control" name="address" placeholder="请输入地址">
+    </div>
+    <div class="layui-col-md2">
+        <button type="submit" lay-submit="" lay-filter="city-submit"
+                class="layui-btn layui-btn-danger">提交
+        </button>
+    </div>
+</form>
                                 </div>
                             </div>
                         </div>
@@ -148,31 +161,47 @@
 {% block js %}
     {# 薪资分布情况 #}
     <script type="text/html" id="mymodal">
-        <form class="layui-form layui-row layui-col-space16">
-            {% csrf_token %}
-            <div class="layui-col-md8">
-                {% verbatim %}
-                <select class="form-control" name="address">
+{#        <form class="layui-form layui-row layui-col-space16">#}
+{#            {% csrf_token %}#}
+{#            <div class="layui-col-md8">#}
+{#                {% verbatim %}#}
+{#                <select class="form-control" name="address">#}
+{##}
+{#                    {{# layui.each(d.AddrSelect.addrsel,function(index,item){ }}#}
+{#                    {{# if(d.address == item){ }}#}
+{#                    <option value="{{ item }}" selected>{{ item }}</option>#}
+{#                    {{# }else{ }}#}
+{#                    <option value="{{ item }}">{{ item }}</option>#}
+{#                    {{# } }}#}
+{#                    {{# }); }}#}
+{##}
+{#                </select>#}
+{#                {% endverbatim %}#}
+{#            </div>#}
+{#            <div class="layui-col-md2">#}
+{#                <button type="submit"#}
+{#                        lay-submit#}
+{#                        lay-filter="city-submit"#}
+{#                        class="layui-btn layui-btn-danger">提交#}
+{#                </button>#}
+{#            </div>#}
+{#        </form>#}
+<form class="layui-form layui-row layui-col-space16">
+    {% csrf_token %}
+    <div class="layui-col-md8">
+        {% verbatim %}
+        <input type="text" class="form-control" name="address" placeholder="请输入地址" value="{{ d.address }}">
+        {% endverbatim %}
+    </div>
+    <div class="layui-col-md2">
+        <button type="submit"
+                lay-submit
+                lay-filter="city-submit"
+                class="layui-btn layui-btn-danger">提交
+        </button>
+    </div>
+</form>
 
-                    {{# layui.each(d.AddrSelect.addrsel,function(index,item){ }}
-                    {{# if(d.address == item){ }}
-                    <option value="{{ item }}" selected>{{ item }}</option>
-                    {{# }else{ }}
-                    <option value="{{ item }}">{{ item }}</option>
-                    {{# } }}
-                    {{# }); }}
-
-                </select>
-                {% endverbatim %}
-            </div>
-            <div class="layui-col-md2">
-                <button type="submit"
-                        lay-submit
-                        lay-filter="city-submit"
-                        class="layui-btn layui-btn-danger">提交
-                </button>
-            </div>
-        </form>
     </script>
     <script>
         var laytpl = layui.laytpl;
@@ -252,7 +281,7 @@
                             }
                         },
                         error: function () {
-                            layer.msg('请求失败')
+                            layer.msg('请输入正确城市名称')
                         }
                     })
                     return false

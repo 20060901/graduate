@@ -151,3 +151,13 @@ SIMPLEUI_DEFAULT_THEME = 'layui.css'
 
 CAPTCHA_IMAGE_SIZE = (100, 50)
 CAPTCHA_FONT_SIZE = 29
+
+
+EMAIL_USE_SSL = True
+EMAIL_HOST = 'smtp.qq.com'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = '1980147463@qq.com'  # 帐号
+EMAIL_HOST_PASSWORD = 'sbtxaufsybjyhfec'  # 密码
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

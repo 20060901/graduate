@@ -111,14 +111,23 @@
                                                                                   style="position: absolute; display: none;">用户名不能为空！</span>
                                                                         </div>
                                                                         <div class="mb-4">
+                                                                            <label for="email"
+                                                                                   class="form-label">电子邮箱</label>
+                                                                            <input type="email" class="form-control"
+                                                                                   id="email" name="email"
+                                                                                   placeholder="电子邮箱"
+                                                                                   value="{{ item.email }}"
+                                                                                   autofocus required>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="col-lg-6">
+                                                                        <div class="mb-4">
                                                                             <label for="example-fileinput"
                                                                                    class="form-label">选择头像</label>
                                                                             <input type="file" id="example-fileinput"
                                                                                    class="form-control" name="pic">
                                                                         </div>
-                                                                    </div>
-
-                                                                    <div class="col-lg-6">
                                                                         <div class="mb-5" style="position: relative">
                                                                             <label for="example-palaceholder"
                                                                                    class="form-label">手机号</label>
@@ -131,25 +140,35 @@
                                                                                   style="position: absolute; display: none;">请输入有效的 11 位手机号!</span>
                                                                             <p class="text-danger"
                                                                                style="position: absolute;">{{ error_msg }}</p>
-                                                                            {% if messages %}
-                                                                                {% for message in messages %}
-                                                                                    <span class="alert alert-{{ message.tags }}"
-                                                                                          style="position: absolute;">
-                                                                                        {{ message }}
-                                                                                    </span>
-                                                                                {% endfor %}
-                                                                            {% endif %}
+
+
                                                                         </div>
 
-                                                                        <div class="mb-1">
-                                                                            <button type="submit"
-                                                                                    class="btn btn-primary w-md">保存
-                                                                            </button>
+                                                                    </div>
+                                                                    {% if messages %}
+                                                                        <div style="position: relative; top: -20px; left: 300px;">
+                                                                            {% for message in messages %}
+                                                                                <span class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </span>
+                                                                            {% endfor %}
                                                                         </div>
-                                                                    </div>
-                                                                    </div>
-
+                                                                        <script>
+                                                                            setTimeout(function () {
+                                                                                document.querySelectorAll('.alert').forEach(function (alert) {
+                                                                                    alert.style.display = 'none';
+                                                                                });
+                                                                            }, 3000); // 3秒后隐藏消息元素
+                                                                        </script>
+                                                                    {% endif %}
                                                                 {% endfor %}
+
+                                                                <div class="mb-1" style="text-align: center;">
+                                                                    <button type="submit"
+                                                                            class="btn btn-primary w-md">保存
+                                                                    </button>
+                                                                </div>
+                                                            </div>
                                                         </form>
                                                     </div>
                                                 </div>
@@ -231,7 +250,7 @@
                     $usernameErrorSpan.hide();
                 }
                 // 如果手机号码、密码和用户名都合法,则允许表单提交
-                if (isValidPhone($phoneInput.val())  && $usernameInput.val()) {
+                if (isValidPhone($phoneInput.val()) && $usernameInput.val()) {
                     return true;
                 } else {
                     return false;

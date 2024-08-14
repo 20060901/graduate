@@ -109,7 +109,7 @@ def chengshi_qk(request):
     if request.method=='POST':
         address=request.POST['address']
     else:
-        address='北京'
+        address='武汉'
     addrsel = getChartsAddr.AddrSelect()
     # 薪资分布
     salname, salvalue = getChartsAddr.salaryFenbu(address)

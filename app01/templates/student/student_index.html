@@ -207,6 +207,15 @@
                                                             {% csrf_token %}
                                                             <div class="row">
                                                                 {% for item in queryset %}
+                                                                     <div class="mb-4">
+                                                                            <label for="email"
+                                                                                   class="form-label">电子邮箱</label>
+                                                                            <input type="email" class="form-control"
+                                                                                   id="email" name="email"
+                                                                                   placeholder="电子邮箱"
+                                                                                   value="{{ item.email }}"
+                                                                                   autofocus required>
+                                                                        </div>
                                                                     <div class="col-lg-6">
                                                                         <div class="mb-3">
                                                                             <label for="simpleinput"
@@ -229,6 +238,9 @@
                                                                                   style="position: absolute; display: none;">用户名不能为空！</span>
                                                                         </div>
 
+
+
+
                                                                         <div class="mb-3">
                                                                             <label for="example-select"
                                                                                    class="form-label">毕业去向</label>
@@ -241,6 +253,7 @@
                                                                                 </optgroup>
                                                                             </select>
                                                                         </div>
+
                                                                         <div class="mb-3">
                                                                             <label for="example-fileinput"
                                                                                    class="form-label">选择头像</label>
@@ -260,13 +273,6 @@
                                                                                    name="phone">
                                                                             <span class="text-danger span-phone"
                                                                                   style="position: absolute; display: none;">请输入有效的 11 位手机号!</span>
-                                                                            {% if messages %}
-                                                                                {% for message in messages %}
-                                                                                    <div class="alert alert-{{ message.tags }} mt-1">
-                                                                                        {{ message }}
-                                                                                    </div>
-                                                                                {% endfor %}
-                                                                            {% endif %}
                                                                         </div>
                                                                         <div class="mb-3">
                                                                             <label for="simpleinput"
@@ -331,6 +337,22 @@
                                                                                     class="btn btn-primary w-md">保存
                                                                             </button>
                                                                         </div>
+                                                                       {% if messages %}
+                                                                        <div style="position: relative; top: -50px; left: 150px;">
+                                                                            {% for message in messages %}
+                                                                                <span class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </span>
+                                                                            {% endfor %}
+                                                                        </div>
+                                                                        <script>
+                                                                            setTimeout(function () {
+                                                                                document.querySelectorAll('.alert').forEach(function (alert) {
+                                                                                    alert.style.display = 'none';
+                                                                                });
+                                                                            }, 3000); // 3秒后隐藏消息元素
+                                                                        </script>
+                                                                    {% endif %}
                                                                     </div>
                                                                     </div>
 
