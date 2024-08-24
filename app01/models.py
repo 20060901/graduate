@@ -119,6 +119,7 @@ class Notice(models.Model):
     title = models.CharField(verbose_name="标题", max_length=200)
     content = models.TextField(verbose_name="内容")
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name='notices')
+    classes = models.ManyToManyField(Class, related_name='notices', verbose_name='班级')
     created_at = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
 
     def __str__(self):

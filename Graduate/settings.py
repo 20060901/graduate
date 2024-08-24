@@ -161,3 +161,6 @@ EMAIL_HOST_PASSWORD = 'sbtxaufsybjyhfec'  # 密码
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+from datetime import timedelta
+# 设置密码重置链接有效时间为24小时
+PASSWORD_RESET_TIMEOUT = 60 * 60 * 24  # 24小时，以秒为单位

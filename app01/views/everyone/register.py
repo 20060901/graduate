@@ -43,3 +43,6 @@ def register(request):
         'classes': classes,
     }
     return render(request, 'everyone/register.html', context)  # 渲染并返回注册页面
+
+def page_not_found(request, exception):
+    return render(request, 'everyone/404.html')

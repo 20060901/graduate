@@ -267,14 +267,24 @@ def student_clear_notice(request):
 
 # 显示所有通知
 def student_notice(request):
+    # 从session中获取学生信息
     stu_info = request.session.get('info')
-    teacher_id = Class.objects.filter(id=stu_info['class']).values('teacher_id')[0]['teacher_id']
-    laoshi_info = Teacher.objects.filter(id=teacher_id)
-    teacher_issues_notice = Notice.objects.filter(teacher_id=teacher_id).order_by('-created_at')
+
+    # 获取学生所关联的班级
+    student_classes = Class.objects.filter(id=stu_info['class'])
+
+    # 过滤出与学生班级相关的通知
+    notices = Notice.objects.filter(classes__in=student_classes).order_by('-created_at')
+
+    # 获取与学生相关的老师信息，可以根据需要获取
+    # 假设学生的class有teacher信息，这里可以直接获取
+    teacher_ids = student_classes.values_list('teacher_id', flat=True).distinct()
+    laoshi_info = Teacher.objects.filter(id__in=teacher_ids)
+
     context = {
         "stu_info": stu_info,
         'laoshi_info': laoshi_info,
-        'notices': teacher_issues_notice
+        'notices': notices
     }
     return render(request, 'student/student_notice.html', context)
 
@@ -416,3 +426,9 @@ def kaoyan(request):
         "page_string": page_object.html()  # 页码
     }
     return render(request, 'student/kaoyan.html', context)
+
+def calendar(request):
+    stu_info = request.session.get('info')
+    return render(request, 'student/calendar.html', {
+        "stu_info": stu_info,
+    })

@@ -22,7 +22,8 @@ urlpatterns = [
                   path('student/index/', student.stu_index),
                   path('student/edit/password/', student.student_edit_password),
                   path("student/forgetpasswd/", student.student_forgetpasswd),
-                  path('reset-student-password/<str:uidb64>/<str:token>/', student.reset_password,name='reset-student-password'),
+                  path('reset-student-password/<str:uidb64>/<str:token>/', student.reset_password,
+                       name='reset-student-password'),
                   path('logout/', tools.logout),
                   path('student/china/', student_echarts.student_china),
                   path('student/get/china/data/', student_echarts.student_get_china_data),
@@ -36,13 +37,15 @@ urlpatterns = [
                   path('student/chartsAddr/', student.chartsAddr),
                   path('student/chartsCompany/', student.chartsCompany),
                   path('student/kaoyan/', student.kaoyan),
+                  path('student/calendar/', student.calendar),
 
                   # 学生清除红点
                   path('student/clear_notice/', student.student_clear_notice),
                   # 教师登陆
                   path('teacher/login/', teacher.teacher_login),
                   path("teacher/forgetpasswd/", teacher.teacher_forgetpasswd),
-                  path('reset-teacher-password/<str:uidb64>/<str:token>/', teacher.reset_password, name='reset-teacher-password'),
+                  path('reset-teacher-password/<str:uidb64>/<str:token>/', teacher.reset_password,
+                       name='reset-teacher-password'),
                   path('teacher_index/', teacher.teacher_index),
                   # 教师查看学生信息
                   path('teacher_student_views/', teacher.teacher_student_views),
@@ -64,8 +67,13 @@ urlpatterns = [
                   path('teacher/china/', teacher_echarts.teacher_china),
                   path('teacher/get/china/data/', teacher_echarts.teacher_get_china_data),
                   # 教师发布通知和管理通知
-                  path('teacher_add/notice/', teacher_notice.add_notice),
+                  path('teacher/add/notice/', teacher_notice.add_notice),
                   path('teacher_manage/notice/', teacher_notice.manage_notice),
+                  path('teacher/get/notice/edit_detail/', teacher_notice.get_notice_edit_detail),
+                  path('teacher/notice/edit/', teacher_notice.teacher_notice_edit),
+                  path('teacher/notice/delete/', teacher_notice.teacher_notice_delete),
                   # path(r'^static/(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT})
                   path('static/<path:path>', serve, {'document_root': MEDIA_ROOT})
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+handler404 = register.page_not_found

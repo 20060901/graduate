@@ -63,8 +63,6 @@ def edit_job(request):
     companyPeople=companyPeople[:-1].split('-')
     companyPeople = list(map(int, companyPeople))
 
-
-
     if not job_id or not title or not address:
         return JsonResponse({'code': 1, 'msg': '职位不存在'}, status=400)
 

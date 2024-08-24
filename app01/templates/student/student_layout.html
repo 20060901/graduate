@@ -282,6 +282,13 @@
                     </a>
                 </li>
 
+{#                <li class="side-nav-item menuitem-active">#}
+{#                            <a href="/student/calendar/" class="side-nav-link active">#}
+{#                                <i class="ri-calendar-2-fill"></i>#}
+{#                                <span> Calendar </span>#}
+{#                            </a>#}
+{#                        </li>#}
+
                 <li class="side-nav-item">
                     <a data-bs-toggle="collapse" href="#sidebarTables" aria-expanded="false"
                        aria-controls="sidebarTables" class="side-nav-link">
@@ -300,7 +307,19 @@
                             <li>
                                 <a href="/student/kaoyan/">考研信息</a>
                             </li>
-                            <li>
+
+                        </ul>
+                    </div>
+                </li>
+                <li class="side-nav-item">
+                            <a data-bs-toggle="collapse" href="#sidebarCharts" aria-expanded="false" aria-controls="sidebarCharts" class="side-nav-link collapsed">
+                                <i class="ri-bubble-chart-fill"></i>
+                                <span> 岗位分析 </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <div class="collapse" id="sidebarCharts" style="">
+                                <ul class="side-nav-second-level">
+                                    <li>
                                 <a href="/student/dataTable/">数据表格</a>
                             </li>
                             <li>
@@ -321,9 +340,10 @@
                             <li>
                                 <a href="/student/chartsCompany/">企业情况</a>
                             </li>
-                        </ul>
-                    </div>
-                </li>
+
+                                </ul>
+                            </div>
+                        </li>
             </ul>
             <!--- End Sidemenu -->
             <div class="clearfix"></div>

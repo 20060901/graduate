@@ -13,6 +13,9 @@
                     <div class="col-12">
                         <div class="page-title-box justify-content-between d-flex align-items-md-center flex-md-row flex-column">
                             <h4 class="page-title">通知</h4>
+                            <div id="message" style="display:none; position: fixed; top: 20px; right: 20px; background-color: #4CAF50; color: white; padding: 15px; border-radius: 5px;">
+    编辑成功！
+</div>
                             <ol class="breadcrumb m-0">
 
                             </ol>
@@ -45,15 +48,33 @@
                                     <span class="timeline-icon bg-danger-subtle"><i
                                             class="ri-record-circle-fill text-danger"></i></span>
                                     <h2 class="mt-0 mb-1 fs-30">{{ notice.title }}</h2>
+                                        <!-- 显示班级 -->
+                                    <p class="mt-0 mb-1 fs-16">
+                                        班级：
+                                        {% for class in notice.classes.all %}
+                                            {{ class.name }}{% if not forloop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </p>
                                     <p class="text-muted"><small>{{ notice.created_at|date:"Y-m-d H:i:s" }}</small></p>
                                     <p class="mt-0 mb-1 fs-16">{{ notice.content|safe }}</p>
-                                    <a href="javascript: void(0);" class="btn btn-sm btn-light">👍</a>
+                                    <button data-eid="{{ notice.id }}"
+                                            class="btn btn-outline-primary btn-sm btn-function btnEdit"
+                                            data-bs-toggle="modal" data-bs-target="#signup-modal">
+                                        编辑
+                                    </button>
+                                    <button data-id="{{ notice.id }}"
+                                            class="btn btn-outline-danger btn-sm btnDelete"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#fill-danger-modal">
+                                        删除
+                                    </button>
+
                                 </div>
                             </div>
                             </div>
                             {% endfor %}
 
-                            <!-- 发布通知模态框 -->
+                            <!-- 发布、编辑通知模态框 -->
                             <div id="signup-modal" class="modal fade" tabindexs="-1" role="dialog" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
@@ -65,7 +86,7 @@
                                         <div class="modal-body">
                                             <form id="addForm" action="#" novalidate
                                                   class="ps-3 pe-3">
-
+                                                {% csrf_token %}
                                                 {% for field in form %}
                                                     <div class="mb-3" style="position: relative">
                                                         <label class="form-label">{{ field.label }}</label>
@@ -80,15 +101,38 @@
                                                     </button>
 
                                                     <input type="button" class="btn rounded-pill btn-primary"
-                                                           id="btnSave" value="保存"/>
+                                                           id="btnSave" value="发布"/>
                                                 </div>
                                             </form>
                                         </div>
                                     </div><!-- /.modal-content -->
                                 </div><!-- /.modal-dialog -->
                             </div><!-- /.modal -->
-
                             </div>
+                            <!-- 删除模态框 -->
+                            <div id="fill-danger-modal" class="modal fade" tabindex="-1" role="dialog"
+                                 aria-labelledby="danger-header-modalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content modal-filled bg-danger">
+                                        <div class="modal-header modal-colored-header bg-danger">
+                                            <h4 class="modal-title" id="danger-header-modalLabel">警告</h4>
+                                            <button type="button" class="btn-close btn-close-white"
+                                                    data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <h5 class="mt-0">您确定要删除该通知吗？</h5>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                                                关闭
+                                            </button>
+                                            <input id="confirm_delete" type="button" class="btn btn-outline-light"
+                                                   value="确认">
+                                        </div>
+                                    </div><!-- /.modal-content -->
+                                </div><!-- /.modal-dialog -->
+                            </div>
+
                             <!-- end timeline -->
                         </div> <!-- end col -->
                     </div>
@@ -97,26 +141,6 @@
                 </div> <!-- container -->
 
             </div> <!-- content -->
-
-            <!-- Footer Start -->
-            <footer class="footer">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <script>document.write(new Date().getFullYear())</script>
-                            © HUAT - www.huat.edu.cn
-                        </div>
-                        <div class="col-md-6">
-                            <div class="text-md-end footer-links d-none d-md-block">
-                                <a href="javascript: void(0);">关于</a>
-                                <a href="javascript: void(0);">支持</a>
-                                <a href="javascript: void(0);">联系我们</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </footer>
-            <!-- end Footer -->
 
         </div>
     </div>
@@ -153,14 +177,14 @@
         // 具体实现新增的函数 doAdd
         function doAdd() {
             $.ajax({
-                url: '/teacher_add/notice/',
+                url: '/teacher/add/notice/',
                 type: 'post',
                 data: $('#addForm').serialize(),
                 dataType: 'JSON',
                 success: function (res) {
                     if (res.status) {
                         alert('添加成功！')
-                        location.reload();
+                        location.reload(true);
                     } else {
                         $.each(res.error, function (name, data) {
                             $('#id_' + name).next().text(data[0])
@@ -181,7 +205,7 @@
             })
         }
 
-        // 获取当前要编辑的班级的数据
+        // 获取当前要编辑的通知的数据
         function binBtnEdit() {
             $('.btnEdit').click(function () {
                 // 编辑之前先清除之前模态框表单内容
@@ -189,7 +213,7 @@
                 EDIT_ID = $(this).data('eid');
                 // alert(EDIT_ID)
                 $.ajax({
-                    url: '/get/classes/edit_detail/',
+                    url: '/teacher/get/notice/edit_detail/',
                     type: 'get',
                     data: {
                         eid: EDIT_ID
@@ -197,12 +221,16 @@
                     dataType: "JSON",
                     success: function (res) {
                         if (res.status) {
+                            console.log(res.class_ids)
                             $('#multiple-oneModalLabel').text('编辑')
                             // 将原本的数据在编辑框上显示出来
                             $.each(res.data, function (name, value) {
                                 $('#id_' + name).val(value)
                                 // 修改标题文字
                             })
+                            // 设置班级<select>字段的默认选中项
+                            let selectedClassIds = res.class_ids; // 将返回的class_ids数组存储在变量中
+                            $("#id_classes").val(selectedClassIds).trigger('change');
                         } else {
                             alert(res.error)
                         }
@@ -214,14 +242,14 @@
         // 编辑 函数
         function doEdit() {
             $.ajax({
-                url: '/teacher/classes_edit/' + '?eid=' + EDIT_ID,
+                url: '/teacher/notice/edit/' + '?eid=' + EDIT_ID,
                 type: 'post',
                 data: $('#addForm').serialize(),
                 dataType: 'JSON',
                 success: function (res) {
                     if (res.status) {
                         alert('编辑成功！')
-                        location.reload();
+                        location.reload(true);
                     } else {
                         if (res.tips) {
                             alert(res.tips)
@@ -250,7 +278,7 @@
             $('#confirm_delete').click(function () {
                 // 将 id 发送到后端
                 $.ajax({
-                    url: '/teacher/classes/delete/',
+                    url: '/teacher/notice/delete/',
                     method: "GET",
                     data: {
                         did: id
@@ -258,10 +286,10 @@
                     dataType: "JSON",
                     success: function (res) {
                         if (res.status) {
-                            location.reload()
+                            location.reload(true)
                         } else {
                             alert(res.error);
-                            location.reload()
+                            location.reload(true)
                         }
                     }
                 })
